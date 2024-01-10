@@ -1,10 +1,13 @@
-import 'dart:js';
-import 'package:stylesnap/screens/start.dart';
-import 'package:stylesnap/screens/sign_up.dart'; // Correctly import your Login widget
+//import 'dart:js';
+//import 'package:stylesnap/screens/start.dart';
+//import 'package:stylesnap/screens/sign_up.dart'; // Correctly import your Login widget
 
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/login.dart';
 
 class Signup extends StatelessWidget {
+  const Signup({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,29 +23,35 @@ class Signup extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     top: 75, left: 15, right: 15, bottom: 60),
                 clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(color: Colors.white),
+                decoration: const BoxDecoration(color: Colors.white),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildHeaderText(),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildInputField('Full name', Icons.person),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildInputField('Email', Icons.mail),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildInputField('Phone Number', Icons.phone),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildInputField('Username', Icons.person_outline),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildPasswordInputField('Password'),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildPasswordInputField('Confirm Password'),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildSignUpButton(),
-                    _buildLoginText(),
-                    _buildBackButton(context),
+                    _buildLoginText(context),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20, bottom: 20),
+                        child: _buildBackOption(context),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -60,14 +69,14 @@ class Signup extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 2, color: Color(0xFF7D56CB)),
+          side: const BorderSide(width: 2, color: Color(0xFF7D56CB)),
           borderRadius: BorderRadius.circular(14),
         ),
       ),
       child: Row(
         children: [
-          Icon(iconData, color: Color(0xFF7D56CB)),
-          SizedBox(width: 10),
+          Icon(iconData, color: const Color(0xFF7D56CB)),
+          const SizedBox(width: 10),
           Text(
             label,
             style: TextStyle(
@@ -89,14 +98,14 @@ class Signup extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 2, color: Color(0xFF7D56CB)),
+          side: const BorderSide(width: 2, color: Color(0xFF7D56CB)),
           borderRadius: BorderRadius.circular(14),
         ),
       ),
       child: Row(
         children: [
-          Icon(Icons.lock, color: Color(0xFF7D56CB)),
-          SizedBox(width: 10),
+          const Icon(Icons.lock, color: Color(0xFF7D56CB)),
+          const SizedBox(width: 10),
           Text(
             label,
             style: TextStyle(
@@ -106,7 +115,7 @@ class Signup extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-          Spacer(), // Pushes the eye icon to the end of the row
+          const Spacer(), // Pushes the eye icon to the end of the row
           Icon(Icons.visibility, color: Colors.black.withOpacity(0.6)),
         ],
       ),
@@ -114,7 +123,7 @@ class Signup extends StatelessWidget {
   }
 
   Widget _buildHeaderText() {
-    return SizedBox(
+    return const SizedBox(
       width: 335,
       height: 85,
       child: Text.rich(
@@ -149,55 +158,71 @@ class Signup extends StatelessWidget {
         onPressed: () {
           // TODO: Add your sign-up logic here
         },
-        child: Text('Sign Up'),
         style: ElevatedButton.styleFrom(
-          primary: Color(0xFF7D56CB), // Button color
-          onPrimary: Colors.white, // Text color
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFF7D56CB), // Text color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22), // Rounded corners
           ),
         ),
+        child: const Text('Sign Up'),
       ),
     );
   }
 
-  Widget _buildLoginText() {
+  Widget _buildLoginText(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        text: 'Already have an account? ',
+        style: TextStyle(color: Colors.black),
+        children: [
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () {
+                // Navigate to the Login page when "Login" text is clicked
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Login()), // Replace with your login page widget
+                );
+              },
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  color: Color(0xFF471AA0),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackOption(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to login screen
+        Navigator.pop(context); // Navigate back to the previous page
       },
-      child: Text.rich(
-        TextSpan(
-          text: 'Already have an account? ',
-          style: TextStyle(color: Colors.black),
-          children: [
-            TextSpan(
-              text: 'Login',
-              style: TextStyle(
-                  color: Color(0xFF471AA0), fontWeight: FontWeight.bold),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.arrow_back, color: Colors.black),
+          SizedBox(width: 5),
+          Text(
+            'Back',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+              decoration: TextDecoration.none,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBackButton(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomLeft,
-      child: TextButton.icon(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => start()), // Navigate to Signup screen
-          );
-        },
-        icon: Icon(Icons.arrow_back, size: 24),
-        label: Text('Back'),
-        style: TextButton.styleFrom(
-          primary: Colors.black, // Text and icon color
-        ),
+          ),
+        ],
       ),
     );
   }

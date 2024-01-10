@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/start.dart';
-import 'package:stylesnap/screens/login.dart';
-import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct
+//import 'package:stylesnap/screens/login.dart';
+//import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct
 
 void main() {
-  runApp(Myapp());
+  runApp(const Myapp());
 }
 
 class Myapp extends StatelessWidget {
+  const Myapp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +18,7 @@ class Myapp extends StatelessWidget {
         // You can define the global theme of your app here (optional)
         primarySwatch: Colors.blue,
       ),
-      home: Login(), // Set the home to your Login widget
+      home: const start(), // Set the home to your Login widget
     );
   }
 }
