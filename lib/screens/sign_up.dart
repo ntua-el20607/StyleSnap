@@ -174,7 +174,7 @@ class Signup extends StatelessWidget {
     return Text.rich(
       TextSpan(
         text: 'Already have an account? ',
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
         children: [
           WidgetSpan(
             child: GestureDetector(
@@ -184,10 +184,10 @@ class Signup extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          Login()), // Replace with your login page widget
+                          const Login()), // Replace with your login page widget
                 );
               },
-              child: Text(
+              child: const Text(
                 'Login',
                 style: TextStyle(
                   color: Color(0xFF471AA0),

@@ -152,7 +152,7 @@ class Login extends StatelessWidget {
                 // Navigate to the Sign Up page when clicked
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Signup()),
+                  MaterialPageRoute(builder: (context) => const Signup()),
                 );
               },
               child: const Text(
