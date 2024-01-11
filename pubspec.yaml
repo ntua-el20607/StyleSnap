@@ -64,6 +64,8 @@ flutter:
     - assets/images/Hanger_icon.png
     - assets/images/ruklas.png
     - assets/images/logo_gramata.png
+    - assets/images/formal.png
+    - assets/images/casual.png
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages

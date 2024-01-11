@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/sign_up.dart';
 
 class Login extends StatelessWidget {
-  const Login({Key? key});
+  const Login({super.key});
 
   @override
   Widget build(BuildContext context) {
