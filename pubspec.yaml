@@ -62,6 +62,8 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/images/hanger_icon.png
+    - assets/images/ruklas.png
+    - assets/images/logo_gramata.png
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
