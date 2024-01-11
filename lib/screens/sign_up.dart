@@ -124,7 +124,7 @@ class Signup extends StatelessWidget {
       padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width *
               0.05), // 5% padding on each side
-      child: Text.rich(
+      child: const Text.rich(
         TextSpan(
           children: [
             TextSpan(

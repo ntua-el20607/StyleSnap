@@ -8,13 +8,13 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  TextEditingController _usernameController =
+  final TextEditingController _usernameController =
       TextEditingController(text: 'John22');
-  TextEditingController _emailController =
+  final TextEditingController _emailController =
       TextEditingController(text: 'john22@gmail.com');
-  TextEditingController _phoneController =
+  final TextEditingController _phoneController =
       TextEditingController(text: '+307777777777');
-  TextEditingController _passwordController =
+  final TextEditingController _passwordController =
       TextEditingController(text: 'john22john');
 
   void onLogoutPressed() {
@@ -41,7 +41,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: onLogoutPressed,
           ),
         ],
@@ -56,14 +56,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           bottom: 75,
         ),
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            Container(
+            SizedBox(
               width: 40,
               height: 40,
               child: Stack(
@@ -75,16 +75,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Color(0xFFF4F4F4),
+                        color: const Color(0xFFF4F4F4),
                         shape: BoxShape.circle,
                         border: Border.all(width: 0.50),
                       ),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     left: 8,
                     top: 8,
-                    child: Container(
+                    child: SizedBox(
                       width: 24,
                       height: 24,
                       child: Row(
@@ -92,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 24.01,
                             height: 24.01,
                             child: Stack(
@@ -122,7 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 ElevatedButton(
                   onPressed: onSavePressed,
-                  child: Text(
+                  child: const Text(
                     'Save',
                     style: TextStyle(
                       color: Color(0xFF1D891B), // Green color
@@ -131,7 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 ElevatedButton(
                   onPressed: onDeleteAccountPressed,
-                  child: Text(
+                  child: const Text(
                     'Delete Account',
                     style: TextStyle(
                       color: Color(0xFFC83030), // Red color
@@ -150,7 +150,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String title, TextEditingController controller) {
     return Container(
       width: 300,
-      decoration: BoxDecoration(color: Color(0xFFF4F4F4)),
+      decoration: const BoxDecoration(color: Color(0xFFF4F4F4)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -159,13 +159,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Color(0xFFF4F4F4),
-              borderRadius: BorderRadius.only(
+              color: const Color(0xFFF4F4F4),
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(4),
                 topRight: Radius.circular(4),
               ),
               border: Border.all(
-                color: Color(0xFF4F4F51),
+                color: const Color(0xFF4F4F51),
                 width: 1.50,
               ),
             ),
@@ -176,7 +176,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF4F4F51),
                     fontSize: 12,
                     fontFamily: 'Roboto',
@@ -187,7 +187,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 TextField(
                   controller: controller,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 0),
                     isDense: true,
                   ),

@@ -15,7 +15,7 @@ class start extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: 70),
+              padding: const EdgeInsets.only(top: 70),
               child: Image.asset(
                 "assets/images/Logo.png",
                 width: screenWidth * 0.8,

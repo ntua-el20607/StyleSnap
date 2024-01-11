@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class QRMenuScreen extends StatelessWidget {
+  const QRMenuScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,13 +16,13 @@ class QRMenuScreen extends StatelessWidget {
           bottom: 105,
         ),
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               width: 309,
               height: 60,
               child: Stack(
@@ -34,7 +36,7 @@ class QRMenuScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       clipBehavior: Clip.antiAlias,
-                      decoration: ShapeDecoration(
+                      decoration: const ShapeDecoration(
                         color: Color(0xFF9747FF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
@@ -43,7 +45,7 @@ class QRMenuScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'My QR',
                           textAlign: TextAlign.center,
@@ -68,7 +70,7 @@ class QRMenuScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFF9747FF),
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(22),
@@ -81,7 +83,7 @@ class QRMenuScreen extends StatelessWidget {
                           bottom: BorderSide(),
                         ),
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'Scan',
                           textAlign: TextAlign.center,
@@ -104,7 +106,7 @@ class QRMenuScreen extends StatelessWidget {
             Container(
               width: 282,
               height: 282,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage("https://via.placeholder.com/282x282"),
                   fit: BoxFit.fill,
@@ -118,9 +120,9 @@ class QRMenuScreen extends StatelessWidget {
                 Navigator.pop(context); // Example: Navigate back
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.black,
+                backgroundColor: Colors.black,
               ),
-              child: SizedBox(
+              child: const SizedBox(
                 width: 80,
                 height: 40,
                 child: Center(

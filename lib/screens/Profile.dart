@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 430,
       height: 932,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(color: Colors.white),
       child: Stack(
         children: [
           Positioned(
@@ -17,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
               width: 424,
               height: 91,
               clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -26,7 +28,7 @@ class ProfileScreen extends StatelessWidget {
                   Container(
                     width: 366,
                     height: 89,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       image: DecorationImage(
                         image:
                             NetworkImage("https://via.placeholder.com/366x89"),
@@ -44,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
             child: Container(
               width: 360,
               height: 2,
-              decoration: BoxDecoration(color: Color(0xFFD9D9D9)),
+              decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
             ),
           ),
           Positioned(
@@ -53,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
             child: Container(
               width: 360,
               height: 2,
-              decoration: BoxDecoration(color: Color(0xFFD9D9D9)),
+              decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
             ),
           ),
           Positioned(
@@ -67,7 +69,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
+          const Positioned(
             left: 130,
             top: 508,
             child: Text(
@@ -90,12 +92,12 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               clipBehavior: Clip.antiAlias,
               decoration: ShapeDecoration(
-                color: Color(0xFF9747FF),
+                color: const Color(0xFF9747FF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
             child: Container(
               width: 62,
               height: 62,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage("https://via.placeholder.com/62x62"),
                   fit: BoxFit.fill,
@@ -142,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
+                  SizedBox(
                     width: 142,
                     height: 142.29,
                     child: Column(
@@ -153,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           width: 142,
                           height: 142.29,
-                          decoration: ShapeDecoration(
+                          decoration: const ShapeDecoration(
                             image: DecorationImage(
                               image: NetworkImage(
                                   "https://via.placeholder.com/142x142"),
@@ -166,7 +168,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -191,7 +193,7 @@ class ProfileScreen extends StatelessWidget {
           Positioned(
             left: 14,
             top: 842,
-            child: Container(
+            child: SizedBox(
               width: 400,
               height: 90,
               child: Stack(
@@ -202,13 +204,13 @@ class ProfileScreen extends StatelessWidget {
                     child: Container(
                       width: 400,
                       height: 90,
-                      decoration: BoxDecoration(color: Colors.white),
+                      decoration: const BoxDecoration(color: Colors.white),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     left: 333,
                     top: 22,
-                    child: Container(
+                    child: SizedBox(
                       width: 43.85,
                       height: 46.22,
                       child: Stack(
@@ -235,10 +237,10 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     left: 257,
                     top: 22,
-                    child: Container(
+                    child: SizedBox(
                       width: 48,
                       height: 46.20,
                       child: Stack(
@@ -268,7 +270,7 @@ class ProfileScreen extends StatelessWidget {
                   Positioned(
                     left: 168,
                     top: 13,
-                    child: Container(
+                    child: SizedBox(
                       width: 64,
                       height: 64,
                       child: Stack(
@@ -279,7 +281,7 @@ class ProfileScreen extends StatelessWidget {
                             child: Container(
                               width: 64,
                               height: 64,
-                              decoration: ShapeDecoration(
+                              decoration: const ShapeDecoration(
                                 color: Color(0xFF9747FF),
                                 shape: OvalBorder(),
                               ),
@@ -289,10 +291,10 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     left: 96,
                     top: 20,
-                    child: Container(
+                    child: SizedBox(
                       height: 47.78,
                       child: Stack(
                         children: [
@@ -317,7 +319,7 @@ class ProfileScreen extends StatelessWidget {
                           Positioned(
                             left: 7,
                             top: 0,
-                            child: Container(
+                            child: SizedBox(
                               width: 30,
                               height: 30,
                               child: Row(
@@ -325,7 +327,7 @@ class ProfileScreen extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: 30,
                                     height: 30,
                                     child: Stack(
@@ -333,7 +335,7 @@ class ProfileScreen extends StatelessWidget {
                                         Positioned(
                                           left: 2.50,
                                           top: 6.23,
-                                          child: Container(
+                                          child: SizedBox(
                                             width: 25,
                                             height: 17.52,
                                             // Your Friends icon or content here
@@ -350,10 +352,10 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     left: 31,
                     top: 22,
-                    child: Container(
+                    child: SizedBox(
                       width: 40.30,
                       height: 46,
                       child: Stack(
