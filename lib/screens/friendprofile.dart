@@ -5,22 +5,33 @@ class friendprof extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // We use MediaQuery to get the height and subtract the status bar height if necessary.
+    double screenHeight =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      body: SingleChildScrollView(
+      body: SafeArea(
+        // Added SafeArea for proper spacing at the top
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             _buildLogoGramata(),
-            const SizedBox(height: 27),
+            SizedBox(
+                height: screenHeight * 0.03), // 3% of screen height for spacing
             _buildProfilePicture(),
-            const SizedBox(height: 27),
+            SizedBox(
+                height: screenHeight * 0.03), // 3% of screen height for spacing
             _buildActionButton("GiorgakisThePresident"),
-            const SizedBox(height: 50),
+            SizedBox(
+                height: screenHeight * 0.05), // 5% of screen height for spacing
             _buildActionButton("georgebush@gmail.com"),
-            const SizedBox(height: 50),
+            SizedBox(
+                height: screenHeight * 0.05), // 5% of screen height for spacing
             _buildActionButton("+13727267482"),
-            const SizedBox(height: 50),
+            SizedBox(
+                height: screenHeight * 0.05), // 5% of screen height for spacing
             _buildRemoveFriendButton(),
-            const SizedBox(height: 50),
+            Spacer(), // Pushes the navigation bar to the bottom
             _buildBottomNavigationBar(context),
           ],
         ),
@@ -123,8 +134,8 @@ class friendprof extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(icon,
-            color:
-                const Color(0xFF8A56AC)), // Replace with your icon assets and colors
+            color: const Color(
+                0xFF8A56AC)), // Replace with your icon assets and colors
         Text(label,
             style: const TextStyle(
                 color: Color(0xFF8A56AC))), // Adjust the styling as needed
