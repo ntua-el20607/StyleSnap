@@ -1,47 +1,74 @@
 import 'package:flutter/material.dart';
 
 class Comments extends StatelessWidget {
+  const Comments({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildCommentHeader(),
-            _buildCommentSection("George Bush", "Nice!"),
-            _buildCommentSection("George Bush", "Wow <3 <3"),
-            _buildCommentSection("George Bush", "Hmm interesting style"),
-            _buildCommentSection("George Bush", "Perfectooo"),
-            _buildCommentSection("George Bush", "Nice Outfit bro"),
-            _buildCommentSection("George Bush", "You could do better.."),
-            _buildCommentInputField(),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildCommentHeader(context),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                    12,
+                    (index) => _buildCommentSection(
+                        "User $index", "Comment text $index", 'ruklas.png')),
+              ),
+            ),
+          ),
+          _buildCommentInputField('ruklas.png'),
+        ],
       ),
     );
   }
 
-  Widget _buildCommentHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Text(
-        'Comments',
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+  Widget _buildCommentHeader(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 6,
+      decoration: BoxDecoration(
+        color: Colors.white, // Include color here
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 2,
+          ),
         ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 7,
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Comments',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCommentSection(String name, String comment) {
+  Widget _buildCommentSection(String name, String comment, String imagePath) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage("https://via.placeholder.com/70x70"),
+            backgroundImage: AssetImage('assets/images/ruklas.png'),
             radius: 35,
           ),
           SizedBox(width: 16),
@@ -62,13 +89,13 @@ class Comments extends StatelessWidget {
     );
   }
 
-  Widget _buildCommentInputField() {
+  Widget _buildCommentInputField(String imagePath) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage("https://via.placeholder.com/70x70"),
+            backgroundImage: AssetImage('assets/images/ruklas.png'),
             radius: 35,
           ),
           SizedBox(width: 16),

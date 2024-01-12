@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/commets.dart';
 
 class HomeCasuals extends StatefulWidget {
   const HomeCasuals({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class HomeCasuals extends StatefulWidget {
 }
 
 class _HomeCasualsState extends State<HomeCasuals> {
-  List<int> _ratings = List.generate(100, (index) => 0);
+  final List<int> _ratings = List.generate(100, (index) => 0);
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +57,8 @@ class _HomeCasualsState extends State<HomeCasuals> {
                           _buildStarRating(index),
                           Spacer(), // Spacer on the right for centering the stars
                           Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Icon(Icons.mode_comment,
-                                color: Colors.grey, size: 30.0),
+                            padding: EdgeInsets.only(right: 16.0),
+                            child: _buildCommentIcon(),
                           ),
                         ],
                       ),
@@ -82,8 +82,8 @@ class _HomeCasualsState extends State<HomeCasuals> {
         Icon(icon, color: Colors.purple), // Set the icon color to purple
         Text(
           label,
-          style:
-              TextStyle(color: Colors.purple), // Set the text color to purple
+          style: const TextStyle(
+              color: Colors.purple), // Set the text color to purple
         ),
       ],
     );
@@ -93,7 +93,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
     return Container(
       width: 57, // Diameter of the circle
       height: 57, // Diameter of the circle
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.purple, // Background color of the button
         shape: BoxShape.circle, // Circular shape
       ),
@@ -127,7 +127,22 @@ class _HomeCasualsState extends State<HomeCasuals> {
   }
 
   Widget _buildCommentIcon() {
-    return const Icon(Icons.comment, color: Colors.grey); // Comment icon
+    return IconButton(
+      icon: const Icon(Icons.mode_comment, color: Colors.grey, size: 30.0),
+      onPressed: () {
+        _showCommentsScreen(context);
+      },
+    );
+  }
+
+  void _showCommentsScreen(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Set to true for full screen modal
+      builder: (BuildContext bc) {
+        return const Comments(); // Your Comments widget
+      },
+    );
   }
 
   Widget _buildArrowIcon() {
