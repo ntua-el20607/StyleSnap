@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "612376194301",
+    "project_id": "stylesnap",
+    "storage_bucket": "stylesnap.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612376194301:android:e96764838f50245e7a2294",
+        "android_client_info": {
+          "package_name": "com.example.stylesnap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNtuTN1m9alsyJ3WMEyTXTxMRQh3M-lgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
