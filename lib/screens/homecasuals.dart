@@ -53,11 +53,11 @@ class _HomeCasualsState extends State<HomeCasuals> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Spacer(), // Spacer on the left
+                          const Spacer(), // Spacer on the left
                           _buildStarRating(index),
-                          Spacer(), // Spacer on the right for centering the stars
+                          const Spacer(), // Spacer on the right for centering the stars
                           Padding(
-                            padding: EdgeInsets.only(right: 16.0),
+                            padding: const EdgeInsets.only(right: 16.0),
                             child: _buildCommentIcon(),
                           ),
                         ],

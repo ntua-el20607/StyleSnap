@@ -28,7 +28,7 @@ class Comments extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 6,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white, // Include color here
         border: Border(
           bottom: BorderSide(
@@ -48,8 +48,8 @@ class Comments extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          SizedBox(height: 8),
-          Text(
+          const SizedBox(height: 8),
+          const Text(
             'Comments',
             style: TextStyle(
               fontSize: 24,
@@ -67,18 +67,18 @@ class Comments extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             backgroundImage: AssetImage('assets/images/ruklas.png'),
             radius: 35,
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(comment),
               ],
@@ -90,8 +90,8 @@ class Comments extends StatelessWidget {
   }
 
   Widget _buildCommentInputField(String imagePath) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
       child: Row(
         children: [
           CircleAvatar(
