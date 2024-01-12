@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/commets.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
-import 'package:stylesnap/screens/homeformals.dart';
 
-class HomeCasuals extends StatefulWidget {
-  const HomeCasuals({Key? key}) : super(key: key);
+class HomeFormals extends StatefulWidget {
+  const HomeFormals({Key? key}) : super(key: key);
 
   @override
-  _HomeCasualsState createState() => _HomeCasualsState();
+  _HomeFormalsState createState() => _HomeFormalsState();
 }
 
-class _HomeCasualsState extends State<HomeCasuals> {
+class _HomeFormalsState extends State<HomeFormals> {
   final List<int> _ratings = List.generate(100, (index) => 0);
 
   @override
@@ -33,12 +32,12 @@ class _HomeCasualsState extends State<HomeCasuals> {
             alignment: Alignment.center,
             children: [
               const Text(
-                'Casuals',
+                ' Formals',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               Positioned(
-                right: 16.0,
+                left: 16.0,
                 child: _buildArrowIcon(),
               ),
             ],
@@ -49,7 +48,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    Image.asset("assets/images/casual.png", fit: BoxFit.cover),
+                    Image.asset("assets/images/formal.png", fit: BoxFit.cover),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
@@ -156,7 +155,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
         shape: BoxShape.rectangle, // Square shape
       ),
       child: IconButton(
-        icon: const Icon(Icons.arrow_forward,
+        icon: const Icon(Icons.arrow_back,
             color: Colors.purple, size: 24), // Adjust icon size as needed
         padding: EdgeInsets.zero, // Remove any default padding
         alignment: Alignment.center, // Center the icon
@@ -165,7 +164,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    const HomeFormals()), // Navigate to HomeCasuals page
+                    const HomeCasuals()), // Navigate to HomeCasuals page
           );
         },
       ),
