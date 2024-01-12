@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/friendprofile.dart';
 //import 'package:stylesnap/screens/addfriend.dart';
 //import 'package:stylesnap/screens/login.dart';
 //import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct

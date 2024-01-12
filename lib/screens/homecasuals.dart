@@ -1,46 +1,68 @@
 import 'package:flutter/material.dart';
 
-class HomeCasuals extends StatelessWidget {
-  const HomeCasuals({super.key});
+class HomeCasuals extends StatefulWidget {
+  const HomeCasuals({Key? key}) : super(key: key);
+
+  @override
+  _HomeCasualsState createState() => _HomeCasualsState();
+}
+
+class _HomeCasualsState extends State<HomeCasuals> {
+  List<int> _ratings = List.generate(100, (index) => 0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment
-            .stretch, // Ensure items stretch to fill the width
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Logo image with a SizedBox
           const SizedBox(height: 30),
           SizedBox(
-            width: MediaQuery.of(context)
-                .size
-                .width, // Adjust width to fit the screen
-            height: 89, // Set a fixed height for the logo
+            width: MediaQuery.of(context).size.width,
+            height: 89,
             child: Image.asset(
               "assets/images/logo_gramata.png",
-              fit:
-                  BoxFit.contain, // Use BoxFit.contain to preserve aspect ratio
+              fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 5), // Space between logo and text
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 1.0),
-            child: Text(
-              'Casuals',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
+          const SizedBox(height: 5),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              const Text(
+                'Casuals',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              Positioned(
+                right: 16.0,
+                child: _buildArrowIcon(),
+              ),
+            ],
           ),
-          // Expanded scrollable column
           Expanded(
             child: ListView.builder(
-              itemCount: 100, // Arbitrary large number for demo
+              itemCount: 100,
               itemBuilder: (context, index) {
                 return Column(
                   children: [
                     Image.asset("assets/images/casual.png", fit: BoxFit.cover),
-                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Spacer(), // Spacer on the left
+                          _buildStarRating(index),
+                          Spacer(), // Spacer on the right for centering the stars
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Icon(Icons.mode_comment,
+                                color: Colors.grey, size: 30.0),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 );
               },
@@ -57,19 +79,68 @@ class HomeCasuals extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon),
-        Text(label),
+        Icon(icon, color: Colors.purple), // Set the icon color to purple
+        Text(
+          label,
+          style:
+              TextStyle(color: Colors.purple), // Set the text color to purple
+        ),
       ],
     );
   }
 
   Widget _buildCenterButton(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        // Action for your button
-      },
-      backgroundColor: Colors.purple,
-      child: const Icon(Icons.add), // Or any color you want
+    return Container(
+      width: 57, // Diameter of the circle
+      height: 57, // Diameter of the circle
+      decoration: BoxDecoration(
+        color: Colors.purple, // Background color of the button
+        shape: BoxShape.circle, // Circular shape
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          // Action for your button
+        },
+      ),
+    );
+  }
+
+  Widget _buildStarRating(int index) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (starIndex) {
+        return IconButton(
+          icon: Icon(
+            _ratings[index] > starIndex ? Icons.star : Icons.star_border,
+            color: _ratings[index] > starIndex ? Colors.amber : Colors.grey,
+            size: 30.0,
+          ),
+          onPressed: () {
+            setState(() {
+              _ratings[index] = starIndex + 1;
+            });
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _buildCommentIcon() {
+    return const Icon(Icons.comment, color: Colors.grey); // Comment icon
+  }
+
+  Widget _buildArrowIcon() {
+    return Container(
+      width: 30, // Adjust size as needed
+      height: 30, // Adjust size as needed
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.purple, width: 2), // Purple border
+        shape: BoxShape.rectangle, // Square shape
+      ),
+      child: const Center(
+        child: Icon(Icons.arrow_forward, color: Colors.purple), // Arrow icon
+      ),
     );
   }
 
@@ -77,7 +148,7 @@ class HomeCasuals extends StatelessWidget {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       width: MediaQuery.of(context).size.width,
-      height: 90,
+      height: 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
