@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class friendprof extends StatelessWidget {
-  const friendprof({super.key});
+class addfriend extends StatelessWidget {
+  const addfriend({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +76,10 @@ class friendprof extends StatelessWidget {
         const Text(
           'George Bush',
           style: TextStyle(
-              // Define this style as per your design requirements
-              ),
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            // Define this style as per your design requirements
+          ),
         ),
       ],
     );
@@ -163,9 +165,9 @@ class friendprof extends StatelessWidget {
         // Implement the removal logic
       },
       child: const Text(
-        'Remove Friend',
+        'Add Friend',
         style: TextStyle(
-          color: Color(0xFFC83030),
+          color: Color.fromARGB(255, 20, 148, 24),
           fontSize: 25,
           // Define this style as a constant if reused
         ),

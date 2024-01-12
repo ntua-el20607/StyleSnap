@@ -10,52 +10,49 @@ class Signup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: SingleChildScrollView(
-        // Added to enable scrolling
+      body: Center(
+        // Center the column
         child: Center(
-          // Center the column
-          child: Column(
-            children: [
-              Container(
-                width: 430,
-                height: 932,
-                padding: const EdgeInsets.only(
-                    top: 75, left: 15, right: 15, bottom: 60),
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildHeaderText(),
-                    const SizedBox(height: 30),
-                    _buildInputField('Full name', Icons.person),
-                    const SizedBox(height: 30),
-                    _buildInputField('Email', Icons.mail),
-                    const SizedBox(height: 30),
-                    _buildInputField('Phone Number', Icons.phone),
-                    const SizedBox(height: 30),
-                    _buildInputField('Username', Icons.person_outline),
-                    const SizedBox(height: 30),
-                    _buildPasswordInputField('Password'),
-                    const SizedBox(height: 30),
-                    _buildPasswordInputField('Confirm Password'),
-                    const SizedBox(height: 30),
-                    _buildSignUpButton(),
-                    _buildLoginText(context),
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 20, bottom: 20),
-                        child: _buildBackOption(context),
-                      ),
-                    ),
-                  ],
+          child: Container(
+            width: screenWidth * 1, // 90% of screen width
+            height: screenHeight * 1, // 90% of screen height
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
+            decoration: const BoxDecoration(color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildHeaderText(context),
+                const SizedBox(height: 30),
+                _buildInputField('Full name', Icons.person),
+                const SizedBox(height: 30),
+                _buildInputField('Email', Icons.mail),
+                const SizedBox(height: 30),
+                _buildInputField('Phone Number', Icons.phone),
+                const SizedBox(height: 30),
+                _buildInputField('Username', Icons.person_outline),
+                const SizedBox(height: 30),
+                _buildPasswordInputField('Password'),
+                const SizedBox(height: 30),
+                _buildPasswordInputField('Confirm Password'),
+                const SizedBox(height: 30),
+                _buildSignUpButton(),
+                _buildLoginText(context),
+                const SizedBox(height: 60),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20, bottom: 1),
+                    child: _buildBackOption(context),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -122,26 +119,29 @@ class Signup extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderText() {
-    return const SizedBox(
-      width: 335,
-      height: 85,
-      child: Text.rich(
+  Widget _buildHeaderText(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width *
+              0.05), // 5% padding on each side
+      child: const Text.rich(
         TextSpan(
           children: [
             TextSpan(
               text: 'Create an account\n',
               style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.50),
+                fontSize: 34,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.50,
+              ),
             ),
             TextSpan(
               text: 'Style your life!',
               style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w100,
-                  letterSpacing: 0.70),
+                fontSize: 25,
+                fontWeight: FontWeight.w100,
+                letterSpacing: 0.70,
+              ),
             ),
           ],
         ),
@@ -160,12 +160,15 @@ class Signup extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-          backgroundColor: const Color(0xFF7D56CB), // Text color
+          backgroundColor: const Color(0xFF9747FF), // Text color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22), // Rounded corners
           ),
         ),
-        child: const Text('Sign Up'),
+        child: const Text(
+          'Sign Up',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
     );
   }

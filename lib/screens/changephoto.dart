@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ChangePhotoScreen extends StatelessWidget {
+  const ChangePhotoScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,7 +10,7 @@ class ChangePhotoScreen extends StatelessWidget {
         width: 430,
         height: 932,
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Stack(
           children: [
             Positioned(
@@ -18,7 +20,7 @@ class ChangePhotoScreen extends StatelessWidget {
                 width: 430,
                 height: 932,
                 clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(color: Colors.black),
+                decoration: const BoxDecoration(color: Colors.black),
                 child: Stack(
                   children: [
                     Positioned(
@@ -40,7 +42,7 @@ class ChangePhotoScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(999999),
                                 ),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,13 +90,13 @@ class ChangePhotoScreen extends StatelessWidget {
                                           width: 13.10,
                                           height: 11,
                                           clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(),
-                                          child: Stack(
+                                          decoration: const BoxDecoration(),
+                                          child: const Stack(
                                             children: [
                                               Positioned(
                                                 left: 0,
                                                 top: 0,
-                                                child: Container(
+                                                child: SizedBox(
                                                   width: 13.10,
                                                   height: 11,
                                                   child: Stack(
@@ -110,7 +112,7 @@ class ChangePhotoScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     '1s',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -141,7 +143,7 @@ class ChangePhotoScreen extends StatelessWidget {
                               height: 48,
                               padding: const EdgeInsets.all(8),
                               clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(),
+                              decoration: const BoxDecoration(),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -151,13 +153,13 @@ class ChangePhotoScreen extends StatelessWidget {
                                     width: 19.49,
                                     height: 26.38,
                                     clipBehavior: Clip.antiAlias,
-                                    decoration: BoxDecoration(),
-                                    child: Stack(
+                                    decoration: const BoxDecoration(),
+                                    child: const Stack(
                                       children: [
                                         Positioned(
                                           left: 0,
                                           top: 0,
-                                          child: Container(
+                                          child: SizedBox(
                                             width: 19.49,
                                             height: 26.38,
                                             child: Stack(
@@ -178,13 +180,13 @@ class ChangePhotoScreen extends StatelessWidget {
                               width: 76,
                               height: 76,
                               clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(),
-                              child: Stack(
+                              decoration: const BoxDecoration(),
+                              child: const Stack(
                                 children: [
                                   Positioned(
                                     left: 0,
                                     top: 0,
-                                    child: Container(
+                                    child: SizedBox(
                                       width: 76,
                                       height: 76,
                                       child: Stack(
@@ -203,13 +205,13 @@ class ChangePhotoScreen extends StatelessWidget {
                               height: 48,
                               padding: const EdgeInsets.all(8),
                               clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(),
-                              child: Column(
+                              decoration: const BoxDecoration(),
+                              child: const Column(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: 28.66,
                                     height: 23.92,
                                     child: Stack(
@@ -230,7 +232,7 @@ class ChangePhotoScreen extends StatelessWidget {
                       top: 58,
                       child: Container(
                         padding: const EdgeInsets.all(10),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,7 +263,7 @@ class ChangePhotoScreen extends StatelessWidget {
               child: Container(
                 width: 360,
                 height: 2,
-                decoration: BoxDecoration(color: Color(0xFFD9D9D9)),
+                decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
               ),
             ),
             Positioned(
@@ -273,8 +275,8 @@ class ChangePhotoScreen extends StatelessWidget {
                   width: 35,
                   height: 35,
                   clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(),
-                  child: Stack(
+                  decoration: const BoxDecoration(),
+                  child: const Stack(
                     children: [
                       // Add your widgets here
                     ],

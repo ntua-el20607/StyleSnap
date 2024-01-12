@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/sign_up.dart';
-//import 'package:stylesnap/screens/start.dart';
-//import 'package:stylesnap/screens/sign_up.dart';
-//import 'dart:js';
 
 class Login extends StatelessWidget {
   const Login({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 100),
+    // Calculate 1/3 of the screen height
+    final screenHeight = MediaQuery.of(context).size.height;
+    final offset = screenHeight / 3;
+
+    return Scaffold(
+      backgroundColor: Colors.white, // Set background color to white
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(20, offset, 20, 20), // Adjust padding
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildTitleText('Hi, Welcome Back!'),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20), // Reduce the spacing between elements
               _buildInputField('Email', Icons.email),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               _buildInputField('Password', Icons.lock),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               _buildLoginButton(),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               _buildSignUpText(context),
-              const SizedBox(height: 40),
+              const SizedBox(height: 200),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20, bottom: 20),
-                  child: _buildBackOption(context),
-                ),
+                child: _buildBackOption(
+                    context), // Only the back button is wrapped with Align
               ),
             ],
           ),
