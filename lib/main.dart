@@ -1,12 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:stylesnap/screens/changephoto.dart';
 //import 'package:stylesnap/screens/addfriend.dart';
-import 'package:stylesnap/screens/start.dart';
 import 'firebase_options.dart';
 //import 'package:stylesnap/screens/login.dart';
 //import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct
-import 'package:stylesnap/screens/changephoto.dart';
 import 'package:stylesnap/screens/sign_up.dart';
 //import 'package:stylesnap/screens/changephoto.dart';
 //import 'package:stylesnap/screens/Edit_Profile.dart';

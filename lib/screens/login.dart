@@ -4,7 +4,7 @@ import 'package:stylesnap/screens/sign_up.dart';
 import 'package:stylesnap/screens/homecasuals.dart'; // Import the HomeCasuals screen
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   _LoginState createState() => _LoginState();
@@ -264,7 +264,7 @@ class _LoginState extends State<Login> {
       // If login is successful, navigate to the home screen or another screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeCasuals()),
+        MaterialPageRoute(builder: (context) => const HomeCasuals()),
       );
     } catch (e) {
       // Handle login errors...

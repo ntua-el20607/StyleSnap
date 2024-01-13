@@ -69,13 +69,13 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: BackButton(color: Colors.white),
-        title: Text('StyleSnap',
+        leading: const BackButton(color: Colors.white),
+        title: const Text('StyleSnap',
             style: TextStyle(color: Colors.white, fontSize: 20)),
         centerTitle: true,
       ),
       body: _controller == null || !_controller!.value.isInitialized
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Stack(
               fit: StackFit.expand,
               children: [
@@ -95,7 +95,7 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
                     Expanded(
                         child: Container()), // Pushes the row to the bottom
                     Padding(
-                      padding: EdgeInsets.only(bottom: 20.0),
+                      padding: const EdgeInsets.only(bottom: 20.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -120,7 +120,7 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.flip_camera_ios,
                               color: Colors.white,
                               size: 30,

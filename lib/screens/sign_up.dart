@@ -1,11 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/login.dart';
 
 class Signup extends StatelessWidget {
-  Signup({Key? key}) : super(key: key);
+  Signup({super.key});
 
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
