@@ -21,10 +21,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-<<<<<<< HEAD
   flutter_lints: ^3.0.1
-=======
->>>>>>> 34c210906b286bc42e0491256ef587ba32be1f31
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
