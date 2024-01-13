@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ScrollableImageRow extends StatelessWidget {
-  const ScrollableImageRow({Key? key}) : super(key: key);
+  const ScrollableImageRow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class ScrollableImageRow extends StatelessWidget {
 }
 
 class Friends extends StatelessWidget {
-  const Friends({Key? key}) : super(key: key);
+  const Friends({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +83,8 @@ class Friends extends StatelessWidget {
   Widget buildTopFriendsText(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
+        const Padding(
+          padding: EdgeInsets.only(top: 8.0),
           child: Text(
             'Top Friends',
             style: TextStyle(
@@ -95,7 +95,7 @@ class Friends extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 4, // Space between text and line
         ),
         Container(
@@ -128,9 +128,9 @@ class Friends extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              image: const DecorationImage(
+              image: DecorationImage(
                 image: AssetImage('assets/images/ruklas.png'), // Image path
                 fit: BoxFit.cover,
               ),
