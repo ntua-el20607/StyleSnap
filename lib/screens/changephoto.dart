@@ -1,292 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 
-class ChangePhotoScreen extends StatelessWidget {
+class ChangePhotoScreen extends StatefulWidget {
   const ChangePhotoScreen({super.key});
+  @override
+  _ChangePhotoScreenState createState() => _ChangePhotoScreenState();
+}
+
+class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
+  CameraController? _controller;
+  List<CameraDescription>? _cameras;
+  bool _isRearCameraSelected = true;
+  bool _isFlashOn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initCamera();
+  }
+
+  Future<void> _initCamera() async {
+    _cameras = await availableCameras();
+    if (_cameras != null && _cameras!.isNotEmpty) {
+      _controller = CameraController(
+          _isRearCameraSelected ? _cameras![0] : _cameras![1],
+          ResolutionPreset.max,
+          enableAudio: false,
+          imageFormatGroup: ImageFormatGroup.jpeg);
+      await _controller!.initialize();
+      if (!mounted) return;
+      setState(() {});
+    }
+  }
+
+  Future<void> _toggleCamera() async {
+    if (_cameras != null && _cameras!.length > 1) {
+      _isRearCameraSelected = !_isRearCameraSelected;
+      await _initCamera();
+    }
+  }
+
+  Future<void> _toggleFlash() async {
+    if (_controller != null) {
+      _isFlashOn = !_isFlashOn;
+      await _controller!
+          .setFlashMode(_isFlashOn ? FlashMode.torch : FlashMode.off);
+      setState(() {});
+    }
+  }
+
+  Future<void> _takePicture() async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      final XFile photo = await _controller!.takePicture();
+      // Handle the captured photo...
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: 430,
-        height: 932,
-        clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Colors.white),
-        child: Stack(
-          children: [
-            Positioned(
-              left: 0,
-              top: 0,
-              child: Container(
-                width: 430,
-                height: 932,
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(color: Colors.black),
-                child: Stack(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: const BackButton(color: Colors.white),
+        title: const Text('StyleSnap',
+            style: TextStyle(color: Colors.white, fontSize: 20)),
+        centerTitle: true,
+      ),
+      body: _controller == null || !_controller!.value.isInitialized
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              fit: StackFit.expand,
+              children: [
+                CameraPreview(_controller!),
+                Column(
                   children: [
-                    Positioned(
-                      left: 164,
-                      top: 713,
+                    SizedBox(
+                        height: AppBar().preferredSize.height +
+                            MediaQuery.of(context).padding.top),
+                    Center(
                       child: Container(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              padding: const EdgeInsets.all(8),
-                              decoration: ShapeDecoration(
-                                color: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(999999),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '1x',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontFamily: 'SF Pro Text',
-                                      fontWeight: FontWeight.w500,
-                                      height: 0.11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  top: 6, left: 11, right: 15, bottom: 5),
-                              clipBehavior: Clip.antiAlias,
-                              decoration: ShapeDecoration(
-                                color: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: 13.10,
-                                          height: 11,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: const BoxDecoration(),
-                                          child: const Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0,
-                                                top: 0,
-                                                child: SizedBox(
-                                                  width: 13.10,
-                                                  height: 11,
-                                                  child: Stack(
-                                                    children: [
-                                                      // Add your widgets here
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Text(
-                                    '1s',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontFamily: 'SF Pro Text',
-                                      fontWeight: FontWeight.w500,
-                                      height: 0.11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: 2,
+                        color: Colors.grey,
                       ),
                     ),
-                    Positioned(
-                      left: 111,
-                      top: 784,
-                      child: Container(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              padding: const EdgeInsets.all(8),
-                              clipBehavior: Clip.antiAlias,
-                              decoration: const BoxDecoration(),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 19.49,
-                                    height: 26.38,
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: const BoxDecoration(),
-                                    child: const Stack(
-                                      children: [
-                                        Positioned(
-                                          left: 0,
-                                          top: 0,
-                                          child: SizedBox(
-                                            width: 19.49,
-                                            height: 26.38,
-                                            child: Stack(
-                                              children: [
-                                                // Add your widgets here
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                    Expanded(
+                        child: Container()), // Pushes the row to the bottom
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              _isFlashOn ? Icons.flash_on : Icons.flash_off,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            onPressed: _toggleFlash,
+                          ),
+                          GestureDetector(
+                            onTap: _takePicture,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 4),
                               ),
                             ),
-                            const SizedBox(width: 18),
-                            Container(
-                              width: 76,
-                              height: 76,
-                              clipBehavior: Clip.antiAlias,
-                              decoration: const BoxDecoration(),
-                              child: const Stack(
-                                children: [
-                                  Positioned(
-                                    left: 0,
-                                    top: 0,
-                                    child: SizedBox(
-                                      width: 76,
-                                      height: 76,
-                                      child: Stack(
-                                        children: [
-                                          // Add your widgets here
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.flip_camera_ios,
+                              color: Colors.white,
+                              size: 30,
                             ),
-                            const SizedBox(width: 18),
-                            Container(
-                              width: 48,
-                              height: 48,
-                              padding: const EdgeInsets.all(8),
-                              clipBehavior: Clip.antiAlias,
-                              decoration: const BoxDecoration(),
-                              child: const Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 28.66,
-                                    height: 23.92,
-                                    child: Stack(
-                                      children: [
-                                        // Add your widgets here
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 146,
-                      top: 58,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'StyleSnap',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontStyle: FontStyle.italic,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w200,
-                                height: 0.03,
-                              ),
-                            ),
-                          ],
-                        ),
+                            onPressed: _toggleCamera,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-            Positioned(
-              left: 35,
-              top: 105,
-              child: Container(
-                width: 360,
-                height: 2,
-                decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
-              ),
-            ),
-            Positioned(
-              left: 35,
-              top: 59,
-              child: Opacity(
-                opacity: 0.85,
-                child: Container(
-                  width: 35,
-                  height: 35,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(),
-                  child: const Stack(
-                    children: [
-                      // Add your widgets here
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

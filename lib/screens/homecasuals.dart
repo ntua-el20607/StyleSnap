@@ -3,7 +3,7 @@ import 'package:stylesnap/screens/commets.dart';
 import 'package:stylesnap/screens/homeformals.dart';
 
 class HomeCasuals extends StatefulWidget {
-  const HomeCasuals({Key? key}) : super(key: key);
+  const HomeCasuals({super.key});
 
   @override
   _HomeCasualsState createState() => _HomeCasualsState();
