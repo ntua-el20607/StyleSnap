@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 //import 'package:stylesnap/screens/login.dart';
 //import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct
 //import 'package:stylesnap/screens/changephoto.dart';
-import 'package:stylesnap/screens/homecasuals.dart';
-import 'package:stylesnap/screens/homeformals.dart';
+import 'package:stylesnap/screens/friends.dart';
 //import 'package:stylesnap/screens/Edit_Profile.dart';
 //import 'package:stylesnap/screens/scanQR.dart';
 //import 'package:stylesnap/screens/QRmenu.dart';
@@ -25,7 +24,7 @@ class Myapp extends StatelessWidget {
         // You can define the global theme of your app here (optional)
         primarySwatch: Colors.blue,
       ),
-      home: const HomeFormals(), // Set the home to your Login widget
+      home: const Friends(), // Set the home to your Login widget
     );
   }
 }

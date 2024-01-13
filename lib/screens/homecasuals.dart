@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/commets.dart';
-import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/homeformals.dart';
 
 class HomeCasuals extends StatefulWidget {
