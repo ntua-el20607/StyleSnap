@@ -30,8 +30,7 @@ class ProfileScreen extends StatelessWidget {
                     height: 89,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                        image:
-                            NetworkImage("https://via.placeholder.com/366x89"),
+                        image: NetworkImage("assets/images/profile_pic.png"),
                         fit: BoxFit.fill,
                       ),
                     ),

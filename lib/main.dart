@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/start.dart';
 import 'firebase_options.dart';
 //import 'package:stylesnap/screens/login.dart';
@@ -32,7 +33,7 @@ class Myapp extends StatelessWidget {
         // You can define the global theme of your app here (optional)
         primarySwatch: Colors.blue,
       ),
-      home: Signup(), // Set the home to your Login widget
+      home: ProfileScreen(), // Set the home to your Login widget
     );
   }
 }
