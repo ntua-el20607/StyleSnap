@@ -1,42 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:stylesnap/screens/sign_up.dart';
+import 'package:stylesnap/screens/homecasuals.dart'; // Import the HomeCasuals screen
 
-class Login extends StatelessWidget {
-  const Login({super.key});
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // Calculate 1/3 of the screen height
     final screenHeight = MediaQuery.of(context).size.height;
     final offset = screenHeight / 3;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color to white
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.fromLTRB(20, offset, 20, 20), // Adjust padding
+        padding: EdgeInsets.fromLTRB(20, offset, 20, 20),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildTitleText('Hi, Welcome Back!'),
-              const SizedBox(height: 20), // Reduce the spacing between elements
-              _buildInputField('Email', Icons.email),
               const SizedBox(height: 20),
-              _buildInputField('Password', Icons.lock),
+              _buildInputField('Email', Icons.email, _emailController),
               const SizedBox(height: 20),
-              _buildLoginButton(),
+              _buildPasswordInputField('Password', _passwordController),
+              const SizedBox(height: 20),
+              _buildLoginButton(context),
               const SizedBox(height: 20),
               _buildSignUpText(context),
               const SizedBox(height: 200),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: _buildBackOption(
-                    context), // Only the back button is wrapped with Align
+                child: _buildBackOption(context),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordInputField(
+      String label, TextEditingController controller) {
+    return Container(
+      width: 390,
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(width: 2, color: Color(0xFF7D56CB)),
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.lock, color: Color(0xFF7D56CB)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              obscureText: true, // Set obscureText to true for password field
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: label,
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.3),
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -58,13 +106,11 @@ class Login extends StatelessWidget {
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: 2.0), // Adjust padding as needed
+              padding: EdgeInsets.symmetric(horizontal: 2.0),
               child: Icon(
-                Icons.waving_hand, // Replace with the icon you want to use
-                color: Color.fromARGB(
-                    255, 248, 171, 4), // Custom color, adjust as needed
-                size: 24, // Adjust size to match your text
+                Icons.waving_hand,
+                color: Color.fromARGB(255, 248, 171, 4),
+                size: 24,
               ),
             ),
           ),
@@ -73,7 +119,8 @@ class Login extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String placeholder, IconData iconData) {
+  Widget _buildInputField(
+      String placeholder, IconData iconData, TextEditingController controller) {
     return Container(
       width: 390,
       height: 50,
@@ -88,17 +135,22 @@ class Login extends StatelessWidget {
         children: [
           Icon(
             iconData,
-            color: const Color(0xFF9747FF), // Same color as the login button
+            color: const Color(0xFF9747FF),
           ),
           const SizedBox(width: 10),
-          Text(
-            placeholder,
-            style: TextStyle(
-              color: Colors.black.withOpacity(0.3),
-              fontSize: 15,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              decoration: TextDecoration.none,
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: placeholder,
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.3),
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
         ],
@@ -106,7 +158,7 @@ class Login extends StatelessWidget {
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildLoginButton(BuildContext context) {
     return Container(
       width: 282,
       height: 66,
@@ -117,16 +169,21 @@ class Login extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
         ),
       ),
-      child: const Center(
-        child: Text(
-          'Login',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.10,
-            decoration: TextDecoration.none, // Remove underline
+      child: TextButton(
+        onPressed: () {
+          _login(context); // Pass the context to _login
+        },
+        child: const Center(
+          child: Text(
+            'Login',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.10,
+              decoration: TextDecoration.none,
+            ),
           ),
         ),
       ),
@@ -149,10 +206,9 @@ class Login extends StatelessWidget {
           WidgetSpan(
             child: GestureDetector(
               onTap: () {
-                // Navigate to the Sign Up page when clicked
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Signup()),
+                  MaterialPageRoute(builder: (context) => Signup()),
                 );
               },
               child: const Text(
@@ -175,7 +231,7 @@ class Login extends StatelessWidget {
   Widget _buildBackOption(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context); // Navigate back to the previous page
+        Navigator.pop(context);
       },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
@@ -196,5 +252,23 @@ class Login extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _login(BuildContext context) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // If login is successful, navigate to the home screen or another screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeCasuals()),
+      );
+    } catch (e) {
+      // Handle login errors...
+      print("Error during login: $e");
+    }
   }
 }

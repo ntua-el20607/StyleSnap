@@ -1,25 +1,27 @@
-//import 'dart:js';
-//import 'package:stylesnap/screens/start.dart';
-//import 'package:stylesnap/screens/sign_up.dart'; // Correctly import your Login widget
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/login.dart';
 
 class Signup extends StatelessWidget {
-  const Signup({super.key});
+  Signup({Key? key}) : super(key: key);
+
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      body: Center(
-        // Center the column
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
         child: Center(
           child: Container(
-            width: screenWidth * 1, // 90% of screen width
-            height: screenHeight * 1, // 90% of screen height
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
             decoration: const BoxDecoration(color: Colors.white),
             child: Column(
@@ -29,19 +31,23 @@ class Signup extends StatelessWidget {
               children: [
                 _buildHeaderText(context),
                 const SizedBox(height: 30),
-                _buildInputField('Full name', Icons.person),
+                _buildInputField(
+                    'Full name', Icons.person, _fullNameController),
                 const SizedBox(height: 30),
-                _buildInputField('Email', Icons.mail),
+                _buildInputField('Email', Icons.mail, _emailController),
                 const SizedBox(height: 30),
-                _buildInputField('Phone Number', Icons.phone),
+                _buildInputField(
+                    'Phone Number', Icons.phone, _phoneNumberController),
                 const SizedBox(height: 30),
-                _buildInputField('Username', Icons.person_outline),
+                _buildInputField(
+                    'Username', Icons.person_outline, _usernameController),
                 const SizedBox(height: 30),
-                _buildPasswordInputField('Password'),
+                _buildPasswordInputField('Password', _passwordController),
                 const SizedBox(height: 30),
-                _buildPasswordInputField('Confirm Password'),
+                _buildPasswordInputField(
+                    'Confirm Password', _confirmPasswordController),
                 const SizedBox(height: 30),
-                _buildSignUpButton(),
+                _buildSignUpButton(context),
                 _buildLoginText(context),
                 const SizedBox(height: 60),
                 Align(
@@ -59,7 +65,8 @@ class Signup extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String label, IconData iconData) {
+  Widget _buildInputField(
+      String label, IconData iconData, TextEditingController controller) {
     return Container(
       width: 390,
       height: 50,
@@ -74,13 +81,19 @@ class Signup extends StatelessWidget {
         children: [
           Icon(iconData, color: const Color(0xFF7D56CB)),
           const SizedBox(width: 10),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.black.withOpacity(0.3),
-              fontSize: 15,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: label,
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.3),
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
         ],
@@ -88,7 +101,8 @@ class Signup extends StatelessWidget {
     );
   }
 
-  Widget _buildPasswordInputField(String label) {
+  Widget _buildPasswordInputField(
+      String label, TextEditingController controller) {
     return Container(
       width: 390,
       height: 50,
@@ -103,17 +117,22 @@ class Signup extends StatelessWidget {
         children: [
           const Icon(Icons.lock, color: Color(0xFF7D56CB)),
           const SizedBox(width: 10),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.black.withOpacity(0.3),
-              fontSize: 15,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
+          Expanded(
+            child: TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: label,
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.3),
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
-          const Spacer(), // Pushes the eye icon to the end of the row
-          Icon(Icons.visibility, color: Colors.black.withOpacity(0.6)),
         ],
       ),
     );
@@ -150,19 +169,24 @@ class Signup extends StatelessWidget {
     );
   }
 
-  Widget _buildSignUpButton() {
+  Widget _buildSignUpButton(BuildContext context) {
     return SizedBox(
       width: 282,
       height: 66,
       child: ElevatedButton(
         onPressed: () {
-          // TODO: Add your sign-up logic here
+          if (_areAllFieldsOkay()) {
+            _signUp(context); // Pass the context to the _signUp function
+          } else {
+            // Show an error message or take appropriate action
+            print("Not all fields are okay. Please check your input.");
+          }
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-          backgroundColor: const Color(0xFF9747FF), // Text color
+          backgroundColor: const Color(0xFF9747FF),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22), // Rounded corners
+            borderRadius: BorderRadius.circular(22),
           ),
         ),
         child: const Text(
@@ -182,12 +206,9 @@ class Signup extends StatelessWidget {
           WidgetSpan(
             child: GestureDetector(
               onTap: () {
-                // Navigate to the Login page when "Login" text is clicked
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const Login()), // Replace with your login page widget
+                  MaterialPageRoute(builder: (context) => const Login()),
                 );
               },
               child: const Text(
@@ -207,7 +228,7 @@ class Signup extends StatelessWidget {
   Widget _buildBackOption(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context); // Navigate back to the previous page
+        Navigator.pop(context);
       },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
@@ -228,5 +249,84 @@ class Signup extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _signUp(BuildContext context) async {
+    try {
+      if (_areAllFieldsOkay()) {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Save user data to Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'fullName': _fullNameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'phoneNumber': _phoneNumberController.text.trim(),
+          'username': _usernameController.text.trim(),
+          'password': _passwordController.text.trim(),
+          // Add other fields as needed
+        });
+
+        // Navigate to the login page after successful signup
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Login()),
+        );
+      }
+    } catch (e) {
+      // Handle signup errors...
+      print("Error during signup: $e");
+    }
+  }
+
+  bool _areAllFieldsOkay() {
+    return _isFullNameValid(_fullNameController.text.trim()) &&
+        _isEmailValid(_emailController.text.trim()) &&
+        _isPhoneNumberValid(_phoneNumberController.text.trim()) &&
+        _isUsernameValid(_usernameController.text.trim()) &&
+        _isPasswordValid(_passwordController.text.trim()) &&
+        _isConfirmPasswordValid(
+          _passwordController.text.trim(),
+          _confirmPasswordController.text.trim(),
+        );
+  }
+
+  bool _isFullNameValid(String fullName) {
+    return fullName.isNotEmpty &&
+        fullName.length >= 2 &&
+        fullName.length <= 20 &&
+        RegExp(r'^[a-zA-Z ]+$').hasMatch(fullName);
+  }
+
+  bool _isEmailValid(String email) {
+    return email.isNotEmpty &&
+        email.length >= 5 &&
+        email.length <= 25 &&
+        RegExp(r'^[a-zA-Z0-9]+@gmail\.com$').hasMatch(email);
+  }
+
+  bool _isPhoneNumberValid(String phoneNumber) {
+    return phoneNumber.isNotEmpty &&
+        phoneNumber.length == 10 &&
+        phoneNumber.startsWith('69') &&
+        int.tryParse(phoneNumber.substring(2)) != null;
+  }
+
+  bool _isUsernameValid(String username) {
+    return username.isNotEmpty && username.length >= 2 && username.length <= 20;
+  }
+
+  bool _isPasswordValid(String password) {
+    return password.isNotEmpty && password.length >= 8;
+  }
+
+  bool _isConfirmPasswordValid(String password, String confirmPassword) {
+    return confirmPassword.isNotEmpty && confirmPassword == password;
   }
 }
