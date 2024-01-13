@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 //import 'package:stylesnap/screens/sign_up.dart'; // Ensure this path is correct
 import 'package:stylesnap/screens/changephoto.dart';
 import 'package:stylesnap/screens/sign_up.dart';
+//import 'package:stylesnap/screens/changephoto.dart';
+import 'package:stylesnap/screens/friends.dart';
 //import 'package:stylesnap/screens/Edit_Profile.dart';
 //import 'package:stylesnap/screens/scanQR.dart';
 //import 'package:stylesnap/screens/QRmenu.dart';
