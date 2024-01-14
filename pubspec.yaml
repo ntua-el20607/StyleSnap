@@ -52,3 +52,6 @@ flutter:
     - family: Ribeye Marrow
       fonts:
         - asset: assets/fonts/RibeyeMarrow-Regular.ttf
+    - family: Rochester
+      fonts:
+        - asset: assets/fonts/Rochester-Regular.ttf
