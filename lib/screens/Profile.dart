@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/Edit_Profile.dart';
 import 'package:stylesnap/screens/Post.dart';
+import 'package:stylesnap/screens/QRmenu.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
+import 'package:stylesnap/screens/scanQR.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -35,7 +38,7 @@ class ProfileScreen extends StatelessWidget {
               _buildTotalOutfitsCount(),
               const SizedBox(height: 50),
               _buildDivider(),
-              _buildQRButton(),
+              _buildQRButton(context),
             ],
           ),
         ),
@@ -80,7 +83,9 @@ class ProfileScreen extends StatelessWidget {
           horizontal: screenWidth * 0.1), // Centers the button
       child: ElevatedButton(
         onPressed: () {
-          // Handle button press
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => EditProfileScreen()),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF9747FF),
@@ -143,12 +148,14 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQRButton() {
+  Widget _buildQRButton(BuildContext context) {
     return IconButton(
       iconSize: 40, // Increase the icon size
       icon: const Icon(Icons.qr_code),
       onPressed: () {
-        // Handle QR button press
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => ScanQRScreen()),
+        );
       },
     );
   }

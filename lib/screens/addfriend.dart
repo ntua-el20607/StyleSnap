@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class addfriend extends StatelessWidget {
-  const addfriend({super.key});
+  final String username;
+
+  const addfriend({Key? key, required this.username}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

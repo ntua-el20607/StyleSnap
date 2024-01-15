@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class QRMenuScreen extends StatelessWidget {
-  const QRMenuScreen({super.key, Key? key});
+  const QRMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

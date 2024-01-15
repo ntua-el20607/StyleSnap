@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:stylesnap/screens/QRmenu.dart';
 
 class ScanQRScreen extends StatelessWidget {
   const ScanQRScreen({super.key});
@@ -44,35 +45,45 @@ class ScanQRScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildButton('My QR', true),
-            _buildButton('Scan', false),
+            _buildButton('My QR', true, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QRMenuScreen()),
+              );
+            }),
+            _buildButton('Scan', false, () {
+              // Add logic for Scan button if needed
+            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildButton(String text, bool isLeft) {
+  Widget _buildButton(String text, bool isLeft, VoidCallback onTap) {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF9747FF),
-          borderRadius: BorderRadius.horizontal(
-            left: Radius.circular(isLeft ? 22 : 0),
-            right: Radius.circular(isLeft ? 0 : 22),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF9747FF),
+            borderRadius: BorderRadius.horizontal(
+              left: Radius.circular(isLeft ? 22 : 0),
+              right: Radius.circular(isLeft ? 0 : 22),
+            ),
+            border: isLeft ? null : const Border(left: BorderSide(width: 2)),
           ),
-          border: isLeft ? null : const Border(left: BorderSide(width: 2)),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.10,
+          child: Center(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.10,
+              ),
             ),
           ),
         ),
