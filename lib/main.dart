@@ -29,7 +29,7 @@ class Myapp extends StatelessWidget {
         // You can define the global theme of your app here (optional)
         primarySwatch: Colors.blue,
       ),
-      home: const EditProfileScreen(), // Set the home to your Login widget
+      home: const start(), // Set the home to your Login widget
     );
   }
 }
