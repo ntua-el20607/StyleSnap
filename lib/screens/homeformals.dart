@@ -8,7 +8,7 @@ import 'package:stylesnap/screens/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeFormals extends StatefulWidget {
-  const HomeFormals({Key? key}) : super(key: key);
+  const HomeFormals({super.key});
 
   @override
   _HomeFormalsState createState() => _HomeFormalsState();
@@ -72,7 +72,7 @@ class _HomeFormalsState extends State<HomeFormals> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Received photo URL: $photoURL'),
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -104,7 +104,7 @@ class _HomeFormalsState extends State<HomeFormals> {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -112,7 +112,7 @@ class _HomeFormalsState extends State<HomeFormals> {
         final List<Map<String, dynamic>>? postInfoList = snapshot.data;
 
         if (postInfoList == null || postInfoList.isEmpty) {
-          return Center(
+          return const Center(
             child: Text('No posts yet'),
           );
         }

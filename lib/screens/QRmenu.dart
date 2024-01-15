@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 // Import the qr_flutter package
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -11,7 +11,7 @@ class QRMenuScreen extends StatelessWidget {
     final double qrSize = screenSize.width * 0.6;
 
     // Replace 'yourUniqueUserData' with the actual user data to generate the QR code
-    final String qrData = 'yourUniqueUserData';
+    const String qrData = 'yourUniqueUserData';
 
     return Scaffold(
       body: Container(
@@ -100,4 +100,4 @@ class QRMenuScreen extends StatelessWidget {
       ),
     );
   }
-}
+}*/
