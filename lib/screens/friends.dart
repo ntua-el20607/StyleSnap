@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:stylesnap/screens/commets.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/profile.dart'; // Import your Profile screen here
 import 'package:stylesnap/screens/changephoto.dart'; // Import your ChangePhoto screen here
 
 class ScrollableImageRow extends StatelessWidget {
-  const ScrollableImageRow({Key? key});
+  const ScrollableImageRow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,7 @@ class ScrollableImageRow extends StatelessWidget {
 }
 
 class Friends extends StatelessWidget {
-  const Friends({Key? key});
+  const Friends({super.key});
 
   @override
   Widget build(BuildContext context) {

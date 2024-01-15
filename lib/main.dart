@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:stylesnap/screens/friends.dart';
-import 'package:stylesnap/screens/homecasuals.dart';
-import 'package:stylesnap/screens/start.dart';
+import 'package:stylesnap/screens/Edit_Profile.dart';
 //import 'package:stylesnap/screens/addfriend.dart';
 import 'firebase_options.dart';
 //import 'package:stylesnap/screens/login.dart';
@@ -10,7 +8,6 @@ import 'firebase_options.dart';
 //import 'package:stylesnap/screens/changephoto.dart';
 //import 'package:stylesnap/screens/Edit_Profile.dart';
 //import 'package:stylesnap/screens/scanQR.dart';
-import 'package:stylesnap/screens/QRmenu.dart';
 //import 'package:stylesnap/screens/Profile.dart';
 
 Future<void> main() async {

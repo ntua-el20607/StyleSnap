@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/changephoto.dart';
+import 'package:stylesnap/screens/start.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -17,182 +19,156 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _passwordController =
       TextEditingController(text: 'john22john');
 
-  void onLogoutPressed() {
-    // Add your logout logic here
-  }
-
-  void onSavePressed() {
-    // Add your save logic here
-    String updatedUsername = _usernameController.text;
-    String updatedEmail = _emailController.text;
-    String updatedPhone = _phoneController.text;
-    String updatedPassword = _passwordController.text;
-
-    // Perform actions with updated user information
-  }
-
-  void onDeleteAccountPressed() {
-    // Add your delete account logic here
-  }
+  // ... [Keep your existing methods here]
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
+          TextButton(
             onPressed: onLogoutPressed,
+            child: const Text('Log Out', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
-      body: Container(
-        width: 430,
-        height: 932,
-        padding: const EdgeInsets.only(
-          top: 120,
-          left: 55,
-          right: 55,
-          bottom: 75,
-        ),
-        clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Colors.white),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF4F4F4),
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 0.50),
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 8,
-                    top: 8,
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 24.01,
-                            height: 24.01,
-                            child: Stack(
-                              children: [
-                                // Your stack content
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    buildProfilePicture(),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Username", _usernameController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Email", _emailController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer(
+                        "Phone Number", _phoneController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Password", _passwordController),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 150),
-            buildEditableInfoContainer("Username", _usernameController),
-            const SizedBox(height: 25),
-            buildEditableInfoContainer("Email", _emailController),
-            const SizedBox(height: 25),
-            buildEditableInfoContainer("Phone Number", _phoneController),
-            const SizedBox(height: 25),
-            buildEditableInfoContainer("Password", _passwordController),
-            const SizedBox(height: 70),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: onSavePressed,
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Color(0xFF1D891B), // Green color
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: onDeleteAccountPressed,
-                  child: const Text(
-                    'Delete Account',
-                    style: TextStyle(
-                      color: Color(0xFFC83030), // Red color
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          buildActionButtons(),
+        ],
       ),
+    );
+  }
+
+  void onLogoutPressed() {
+    // Logic to handle user logout (e.g., clearing user data, etc.)
+
+    // Navigate to the StartPage
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const start()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void onSavePressed() {
+    // Placeholder for future implementation
+    print("Save button pressed"); // Optional: for debugging
+  }
+
+  void onDeleteAccountPressed() {
+    // Placeholder for future implementation
+    print("Delete account button pressed"); // Optional: for debugging
+  }
+
+  Widget buildProfilePicture() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(width: 0.50),
+            image: const DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage('assets/images/ruklas.png'), // Your image path
+            ),
+          ),
+        ),
+        Positioned(
+          right: 4,
+          bottom: 4,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ChangePhotoScreen()),
+              );
+            },
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.photo_camera,
+                size: 20,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget buildEditableInfoContainer(
       String title, TextEditingController controller) {
-    return Container(
-      width: 300,
-      decoration: const BoxDecoration(color: Color(0xFFF4F4F4)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(top: 10), // Added padding for spacing
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: title,
+          fillColor: const Color(0xFFF4F4F4),
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: const BorderSide(color: Color(0xFF4F4F51), width: 1.5),
+          ),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+      ),
+    );
+  }
+
+  Widget buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: 20, vertical: 20), // Add horizontal padding
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment
+            .spaceBetween, // Aligns items to start and end of the row
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF4F4F4),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
-              ),
-              border: Border.all(
-                color: const Color(0xFF4F4F51),
-                width: 1.50,
-              ),
+          TextButton(
+            onPressed: onSavePressed,
+            child: const Text(
+              'Save',
+              style: TextStyle(color: Color(0xFF1D891B)), // Green text
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFF4F4F51),
-                    fontSize: 12,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w400,
-                    height: 0.11,
-                    letterSpacing: 0.40,
-                  ),
-                ),
-                TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 0),
-                    isDense: true,
-                  ),
-                ),
-              ],
+          ),
+          TextButton(
+            onPressed: onDeleteAccountPressed,
+            child: const Text(
+              'Delete Account',
+              style: TextStyle(color: Color(0xFFC83030)), // Red text
             ),
           ),
         ],

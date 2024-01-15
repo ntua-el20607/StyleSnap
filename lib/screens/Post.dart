@@ -5,12 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/homeformals.dart'; // Add this import
 
 class Post extends StatefulWidget {
-  const Post({Key? key}) : super(key: key);
+  const Post({super.key});
 
   @override
   _PostState createState() => _PostState();
@@ -90,7 +89,7 @@ class _PostState extends State<Post> {
       } else {
         // Show a message to the user that they need to select Casual or Formal
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
                 'Please select either Casual or Formal before taking a picture.'),
             duration: Duration(seconds: 2),
@@ -205,7 +204,7 @@ class _PostState extends State<Post> {
                                     ? Colors
                                         .green // Change the color if pressed
                                     : const Color(0xFF9747FF),
-                                borderRadius: BorderRadius.horizontal(
+                                borderRadius: const BorderRadius.horizontal(
                                   left: Radius.circular(20),
                                 ),
                               ),
@@ -235,7 +234,7 @@ class _PostState extends State<Post> {
                                     ? Colors
                                         .green // Change the color if pressed
                                     : const Color(0xFF9747FF),
-                                borderRadius: BorderRadius.horizontal(
+                                borderRadius: const BorderRadius.horizontal(
                                   right: Radius.circular(20),
                                 ),
                               ),

@@ -52,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
       width: logoWidth,
       height:
           logoWidth / 4, // Adjust the height based on the logo's aspect ratio
-      child: DecoratedBox(
+      child: const DecoratedBox(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/logo_gramata.png'),
@@ -126,12 +126,12 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildTotalOutfitsCount() {
-    return Align(
+    return const Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding:
             EdgeInsets.symmetric(horizontal: 16), // Adjust padding as needed
-        child: const Text(
+        child: Text(
           'Total Outfits:       70',
           style: TextStyle(
             color: Colors.black,
