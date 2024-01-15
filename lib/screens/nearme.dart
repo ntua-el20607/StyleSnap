@@ -5,6 +5,8 @@ import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/post.dart';
+import 'package:stylesnap/screens/addfriend.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Nearme extends StatefulWidget {
   const Nearme({super.key});
@@ -18,7 +20,7 @@ class _NearmeState extends State<Nearme> {
   LatLng _initialCameraPosition =
       const LatLng(20.5937, 78.9629); // Default location
   Location location = Location();
-
+  TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -199,32 +201,62 @@ class _NearmeState extends State<Nearme> {
     double screenWidth = MediaQuery.of(context).size.width;
     double searchBarWidth = screenWidth * 0.9;
     double searchBarHeight = searchBarWidth / 8;
-
     return Container(
       width: searchBarWidth,
       height: searchBarHeight,
-      padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.05), // Adjusted for better centering
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
       child: TextField(
+        controller: searchController,
         decoration: InputDecoration(
-          prefixIcon:
-              const Icon(Icons.search, color: Colors.grey), // Grey search icon
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
           hintText: 'Search...',
-          hintStyle:
-              const TextStyle(color: Colors.grey), // Grey placeholder text
+          hintStyle: const TextStyle(color: Colors.grey),
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsets.symmetric(
-              vertical: searchBarHeight / 4), // Center the text vertically
+          contentPadding: EdgeInsets.symmetric(vertical: searchBarHeight / 4),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
           ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              onSearch(searchController.text);
+            },
+          ),
         ),
-        onTap: () {
-          // Perform action on tap if needed
+        onSubmitted: (value) {
+          onSearch(value);
         },
       ),
     );
+  }
+
+  Future<void> onSearch(String username) async {
+    bool userExists = await searchUser(username);
+    if (userExists) {
+// Navigate to the AddFriend screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => addfriend(username: username)),
+      );
+    } else {
+// Show an error or a message saying user not found
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User not found'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<bool> searchUser(String username) async {
+    var userQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .limit(1)
+        .get();
+    return userQuery.docs.isNotEmpty;
   }
 }
