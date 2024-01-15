@@ -89,7 +89,7 @@ class _PostState extends State<Post> {
       } else {
         // Show a message to the user that they need to select Casual or Formal
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
                 'Please select either Casual or Formal before taking a picture.'),
             duration: Duration(seconds: 2),

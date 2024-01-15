@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/changephoto.dart';
+import 'package:stylesnap/screens/start.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -21,54 +23,108 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Using MediaQuery for responsive layout
-    var screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
+          TextButton(
             onPressed: onLogoutPressed,
+            child: const Text('Log Out', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        // Added to support scrolling
-        child: Container(
-          width: screenSize.width,
-          padding: const EdgeInsets.all(20), // Uniform padding
-          decoration: const BoxDecoration(color: Colors.white),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              buildProfilePicture(),
-              const SizedBox(height: 20),
-              buildEditableInfoContainer("Username", _usernameController),
-              buildEditableInfoContainer("Email", _emailController),
-              buildEditableInfoContainer("Phone Number", _phoneController),
-              buildEditableInfoContainer("Password", _passwordController),
-              const SizedBox(height: 20),
-              buildActionButtons(),
-            ],
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    buildProfilePicture(),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Username", _usernameController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Email", _emailController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer(
+                        "Phone Number", _phoneController),
+                    const SizedBox(height: 30),
+                    buildEditableInfoContainer("Password", _passwordController),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          buildActionButtons(),
+        ],
       ),
     );
   }
 
+  void onLogoutPressed() {
+    // Logic to handle user logout (e.g., clearing user data, etc.)
+
+    // Navigate to the StartPage
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const start()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void onSavePressed() {
+    // Placeholder for future implementation
+    print("Save button pressed"); // Optional: for debugging
+  }
+
+  void onDeleteAccountPressed() {
+    // Placeholder for future implementation
+    print("Delete account button pressed"); // Optional: for debugging
+  }
+
   Widget buildProfilePicture() {
-    return Container(
-      width: 80, // Adjusted size
-      height: 80,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF4F4F4),
-        shape: BoxShape.circle,
-        border: Border.all(width: 0.50),
-      ),
-      child:
-          const Icon(Icons.person, size: 48), // Placeholder for profile picture
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(width: 0.50),
+            image: const DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage('assets/images/ruklas.png'), // Your image path
+            ),
+          ),
+        ),
+        Positioned(
+          right: 4,
+          bottom: 4,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ChangePhotoScreen()),
+              );
+            },
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.photo_camera,
+                size: 20,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -94,24 +150,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget buildActionButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        ElevatedButton(
-          onPressed: onSavePressed,
-          style: ElevatedButton.styleFrom(
-            primary: const Color(0xFF1D891B), // Green color
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: 20, vertical: 20), // Add horizontal padding
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment
+            .spaceBetween, // Aligns items to start and end of the row
+        children: [
+          TextButton(
+            onPressed: onSavePressed,
+            child: const Text(
+              'Save',
+              style: TextStyle(color: Color(0xFF1D891B)), // Green text
+            ),
           ),
-          child: const Text('Save'),
-        ),
-        ElevatedButton(
-          onPressed: onDeleteAccountPressed,
-          style: ElevatedButton.styleFrom(
-            primary: const Color(0xFFC83030), // Red color
+          TextButton(
+            onPressed: onDeleteAccountPressed,
+            child: const Text(
+              'Delete Account',
+              style: TextStyle(color: Color(0xFFC83030)), // Red text
+            ),
           ),
-          child: const Text('Delete Account'),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

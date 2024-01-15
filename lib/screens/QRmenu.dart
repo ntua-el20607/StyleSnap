@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class QRMenuScreen extends StatelessWidget {
-  const QRMenuScreen({Key? key});
+  const QRMenuScreen({super.key, Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class QRMenuScreen extends StatelessWidget {
         future: _getUserData(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -24,12 +24,12 @@ class QRMenuScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildButtonBar(),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () => _generateQRCode(context, qrData),
-                    child: Text('Generate QR Code'),
+                    child: const Text('Generate QR Code'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Back'),

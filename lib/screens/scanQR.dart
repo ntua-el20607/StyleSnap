@@ -20,7 +20,7 @@ class ScanQRScreen extends StatelessWidget {
             const SizedBox(height: 100),
             _buildButtonBar(context),
             const SizedBox(height: 60),
-            Container(
+            SizedBox(
               height: screenHeight * 0.5, // Adjust the height as needed
               child: _buildQRScanner(screenWidth, screenHeight),
             ),
