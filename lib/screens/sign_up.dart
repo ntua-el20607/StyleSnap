@@ -269,6 +269,7 @@ class Signup extends StatelessWidget {
           'phoneNumber': _phoneNumberController.text.trim(),
           'username': _usernameController.text.trim(),
           'password': _passwordController.text.trim(),
+          'friends': {}, // Empty friends list initially
           // Add other fields as needed
         });
 
