@@ -64,25 +64,37 @@ class _PostState extends State<Post> {
 
   Future<void> _takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
-      final XFile photo = await _controller!.takePicture();
+      // Check if either Casual or Formal button is pressed
+      if (_isCasualButtonPressed || _isFormalButtonPressed) {
+        final XFile photo = await _controller!.takePicture();
 
-      // Save the photo to Firebase Storage and get the download URL
-      var photoUrl = await _savePhotoToStorage(photo.path);
+        // Save the photo to Firebase Storage and get the download URL
+        var photoUrl = await _savePhotoToStorage(photo.path);
 
-      // Save the photo URL to Firestore
-      await savePhotoInfoToFirestore(
-          photoUrl, _isCasualButtonPressed ? 'Casual' : 'Formal');
+        // Save the photo URL to Firestore
+        await savePhotoInfoToFirestore(
+            photoUrl, _isCasualButtonPressed ? 'Casual' : 'Formal');
 
-      // Determine the screen to navigate based on the button press
-      if (_isCasualButtonPressed) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeCasuals()),
-        );
-      } else if (_isFormalButtonPressed) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeFormals()),
+        // Determine the screen to navigate based on the button press
+        if (_isCasualButtonPressed) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeCasuals()),
+          );
+        } else if (_isFormalButtonPressed) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeFormals()),
+          );
+        }
+      } else {
+        // Show a message to the user that they need to select Casual or Formal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Please select either Casual or Formal before taking a picture.'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     }

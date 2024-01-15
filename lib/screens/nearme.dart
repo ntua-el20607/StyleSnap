@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:stylesnap/screens/Profile.dart';
+import 'package:stylesnap/screens/friends.dart';
+import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/post.dart';
 
 class Nearme extends StatefulWidget {
   const Nearme({super.key});
@@ -11,7 +15,8 @@ class Nearme extends StatefulWidget {
 
 class _NearmeState extends State<Nearme> {
   late GoogleMapController mapController;
-  LatLng _initialCameraPosition = const LatLng(20.5937, 78.9629); // Default location
+  LatLng _initialCameraPosition =
+      const LatLng(20.5937, 78.9629); // Default location
   Location location = Location();
 
   @override
@@ -54,7 +59,7 @@ class _NearmeState extends State<Nearme> {
         ),
       ),
     );
-    }
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -92,33 +97,22 @@ class _NearmeState extends State<Nearme> {
     );
   }
 
-  Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: Colors.purple), // Set the icon color to purple
-        Text(
-          label,
-          style: const TextStyle(
-              color: Colors.purple), // Set the text color to purple
-        ),
-      ],
-    );
-  }
-
   Widget _buildCenterButton(BuildContext context) {
     return Container(
-      width: 57, // Diameter of the circle
-      height: 57, // Diameter of the circle
+      width: 57,
+      height: 57,
       decoration: const BoxDecoration(
-        color: Colors.purple, // Background color of the button
-        shape: BoxShape.circle, // Circular shape
+        color: Colors.purple,
+        shape: BoxShape.circle,
       ),
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          // Action for your button
+          // Navigate to the Post screen when the + button is pressed
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Post()),
+          );
         },
       ),
     );
@@ -132,11 +126,70 @@ class _NearmeState extends State<Nearme> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavBarItem(context, Icons.home, "Home"),
-          _buildNavBarItem(context, Icons.people, "Friends"),
+          _buildNavBarItem(
+            context,
+            Icons.home,
+            "Home",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeCasuals()),
+              );
+            },
+          ),
+          _buildNavBarItem(
+            context,
+            Icons.people,
+            "Friends",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Friends()),
+              );
+            },
+          ),
           _buildCenterButton(context),
-          _buildNavBarItem(context, Icons.search, "Search"),
-          _buildNavBarItem(context, Icons.person, "Profile"),
+          _buildNavBarItem(
+            context,
+            Icons.search,
+            "Search",
+            () {
+              // Perform the desired action for the Search button
+            },
+          ),
+          _buildNavBarItem(
+            context,
+            Icons.person,
+            "Profile",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavBarItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onPressed,
+  ) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.purple),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.purple),
+          ),
         ],
       ),
     );
@@ -157,7 +210,8 @@ class _NearmeState extends State<Nearme> {
           prefixIcon:
               const Icon(Icons.search, color: Colors.grey), // Grey search icon
           hintText: 'Search...',
-          hintStyle: const TextStyle(color: Colors.grey), // Grey placeholder text
+          hintStyle:
+              const TextStyle(color: Colors.grey), // Grey placeholder text
           filled: true,
           fillColor: Colors.white,
           contentPadding: EdgeInsets.symmetric(
