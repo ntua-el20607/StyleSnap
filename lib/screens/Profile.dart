@@ -5,388 +5,192 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Adjust spacing as needed
+              _buildLogoGramata(context),
+              const SizedBox(height: 35),
+              _buildProfileImage(),
+              const SizedBox(height: 10), // Space between image and text
+              const Text(
+                'Ruklas',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10), // Space between text and button
+              _buildEditProfileButton(context),
+              const SizedBox(height: 20),
+              _buildDivider(),
+              _buildTotalOutfitsSection(context),
+              const SizedBox(height: 50),
+              _buildTotalOutfitsCount(),
+              const SizedBox(height: 50),
+              _buildDivider(),
+              _buildQRButton(),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
+    );
+  }
+
+  Widget _buildLogoGramata(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double logoWidth = screenWidth * 1; // 90% of screen width
+
+    return SizedBox(
+      width: logoWidth,
+      height:
+          logoWidth / 4, // Adjust the height based on the logo's aspect ratio
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/logo_gramata.png'),
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    return const CircleAvatar(
+      radius: 71, // Adjust size as needed
+      backgroundImage: AssetImage("assets/images/ruklas.png"),
+    );
+  }
+
+  Widget _buildEditProfileButton(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double buttonWidth = screenWidth * 0.65; // 80% of the screen width
+
     return Container(
-      width: 430,
-      height: 932,
-      clipBehavior: Clip.antiAlias,
-      decoration: const BoxDecoration(color: Colors.white),
-      child: Stack(
+      width: buttonWidth,
+      margin: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.1), // Centers the button
+      child: ElevatedButton(
+        onPressed: () {
+          // Handle button press
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF9747FF),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          padding: const EdgeInsets.symmetric(
+              vertical: 15), // Adjust padding as needed
+        ),
+        child: const Text(
+          'Edit Profile',
+          style: TextStyle(color: Colors.white), // Text color set to white
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Divider(color: Color(0xFFD9D9D9));
+  }
+
+  Widget _buildTotalOutfitsSection(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        const Text(
+          'Total Outfits',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25,
+            fontFamily: 'Ribeye Marrow',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        Container(
+          width: screenWidth * 0.5,
+          height: 2,
+          color: Colors.black, // Adjust color as needed
+          margin: const EdgeInsets.only(top: 8),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTotalOutfitsCount() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding:
+            EdgeInsets.symmetric(horizontal: 16), // Adjust padding as needed
+        child: const Text(
+          'Total Outfits:       70',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQRButton() {
+    return IconButton(
+      iconSize: 40, // Increase the icon size
+      icon: const Icon(Icons.qr_code),
+      onPressed: () {
+        // Handle QR button press
+      },
+    );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Positioned(
-            left: 3,
-            top: 58,
-            child: Container(
-              width: 424,
-              height: 91,
-              clipBehavior: Clip.antiAlias,
-              decoration: const BoxDecoration(color: Colors.white),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 366,
-                    height: 89,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage("assets/images/profile_pic.png"),
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 35,
-            top: 474,
-            child: Container(
-              width: 360,
-              height: 2,
-              decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
-            ),
-          ),
-          Positioned(
-            left: 35,
-            top: 673,
-            child: Container(
-              width: 360,
-              height: 2,
-              decoration: const BoxDecoration(color: Color(0xFFD9D9D9)),
-            ),
-          ),
-          Positioned(
-            left: 103,
-            top: 542,
-            child: Container(
-              width: 222,
-              height: 2,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5099999904632568),
-              ),
-            ),
-          ),
-          const Positioned(
-            left: 130,
-            top: 508,
-            child: Text(
-              'Total Outfits',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 25,
-                fontFamily: 'Ribeye Marrow',
-                fontWeight: FontWeight.w400,
-                height: 0.04,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 69,
-            top: 401,
-            child: Container(
-              width: 292,
-              height: 53,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              clipBehavior: Clip.antiAlias,
-              decoration: ShapeDecoration(
-                color: const Color(0xFF9747FF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Edit Profile',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w800,
-                      height: 0.06,
-                      letterSpacing: 0.10,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 184,
-            top: 729,
-            child: Container(
-              width: 62,
-              height: 62,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage("https://via.placeholder.com/62x62"),
-                  fit: BoxFit.fill,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 144,
-            top: 179,
-            child: Container(
-              width: 142,
-              height: 192,
-              padding: const EdgeInsets.only(bottom: 11.71),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 142,
-                    height: 142.29,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 142,
-                          height: 142.29,
-                          decoration: const ShapeDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                  "https://via.placeholder.com/142x142"),
-                              fit: BoxFit.fill,
-                            ),
-                            shape: OvalBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'John Wick',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 22,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w500,
-                            height: 0.06,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 14,
-            top: 842,
-            child: SizedBox(
-              width: 400,
-              height: 90,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 400,
-                      height: 90,
-                      decoration: const BoxDecoration(color: Colors.white),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 333,
-                    top: 22,
-                    child: SizedBox(
-                      width: 43.85,
-                      height: 46.22,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 28.44,
-                            child: SizedBox(
-                              width: 43.85,
-                              height: 17.78,
-                              child: Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Color(0xFF9747FF),
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 257,
-                    top: 22,
-                    child: SizedBox(
-                      width: 48,
-                      height: 46.20,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 28.20,
-                            child: SizedBox(
-                              width: 48,
-                              height: 18,
-                              child: Text(
-                                'Search',
-                                style: TextStyle(
-                                  color: Color(0xFF9747FF),
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 168,
-                    top: 13,
-                    child: SizedBox(
-                      width: 64,
-                      height: 64,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 64,
-                              height: 64,
-                              decoration: const ShapeDecoration(
-                                color: Color(0xFF9747FF),
-                                shape: OvalBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 96,
-                    top: 20,
-                    child: SizedBox(
-                      height: 47.78,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 30,
-                            child: SizedBox(
-                              width: 43.85,
-                              height: 17.78,
-                              child: Text(
-                                'Friends',
-                                style: TextStyle(
-                                  color: Color(0xFF9747FF),
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 7,
-                            top: 0,
-                            child: SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 30,
-                                    height: 30,
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
-                                          left: 2.50,
-                                          top: 6.23,
-                                          child: SizedBox(
-                                            width: 25,
-                                            height: 17.52,
-                                            // Your Friends icon or content here
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 31,
-                    top: 22,
-                    child: SizedBox(
-                      width: 40.30,
-                      height: 46,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 28.23,
-                            child: SizedBox(
-                              width: 40.30,
-                              height: 17.78,
-                              child: Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Color(0xFF9747FF),
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildNavBarItem(context, Icons.home, "Home"),
+          _buildNavBarItem(context, Icons.people, "Friends"),
+          _buildCenterButton(context), // Special button in the middle
+          _buildNavBarItem(context, Icons.search, "Search"),
+          _buildNavBarItem(context, Icons.person, "Profile"),
         ],
       ),
+    );
+  }
+
+  Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon,
+            color: const Color(
+                0xFF8A56AC)), // Replace with your icon assets and colors
+        Text(label,
+            style: const TextStyle(
+                color: Color(0xFF8A56AC))), // Adjust the styling as needed
+      ],
+    );
+  }
+
+  Widget _buildCenterButton(BuildContext context) {
+    return Container(
+      width: 68, // Diameter of the circle
+      height: 68, // Diameter of the circle
+      decoration: const BoxDecoration(
+        color:
+            Color(0xFF8A56AC), // Replace with the exact purple color you need
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.add,
+          color: Colors.white), // Replace with your custom cross icon
     );
   }
 }

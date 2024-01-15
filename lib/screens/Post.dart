@@ -106,8 +106,8 @@ class _Post extends State<Post> {
                         children: [
                           Expanded(
                             child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF9747FF),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF9747FF),
                                 borderRadius: BorderRadius.horizontal(
                                     left: Radius.circular(20)),
                               ),
@@ -115,7 +115,7 @@ class _Post extends State<Post> {
                                 onPressed: () {
                                   // Handle Casual button press
                                 },
-                                child: Text(
+                                child: const Text(
                                   "Casual",
                                   style: TextStyle(
                                     fontFamily: "Rochester",
@@ -129,8 +129,8 @@ class _Post extends State<Post> {
                           const SizedBox(width: 2), // Gap between buttons
                           Expanded(
                             child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF9747FF),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF9747FF),
                                 borderRadius: BorderRadius.horizontal(
                                     right: Radius.circular(20)),
                               ),
@@ -138,7 +138,7 @@ class _Post extends State<Post> {
                                 onPressed: () {
                                   // Handle Formal button press
                                 },
-                                child: Text(
+                                child: const Text(
                                   "Formal",
                                   style: TextStyle(
                                     fontFamily: "Rochester",

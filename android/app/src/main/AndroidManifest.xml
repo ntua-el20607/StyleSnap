@@ -3,6 +3,11 @@
         android:label="stylesnap"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCuHty5RVcuPg9f9qiUId7PGUD0erSdWTM"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

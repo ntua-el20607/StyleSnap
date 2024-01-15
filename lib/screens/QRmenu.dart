@@ -1,147 +1,101 @@
 import 'package:flutter/material.dart';
+// Import the qr_flutter package
+import 'package:qr_flutter/qr_flutter.dart';
 
 class QRMenuScreen extends StatelessWidget {
   const QRMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final double qrSize = screenSize.width * 0.6;
+
+    // Replace 'yourUniqueUserData' with the actual user data to generate the QR code
+    final String qrData = 'yourUniqueUserData';
+
     return Scaffold(
       body: Container(
-        width: 430,
-        height: 932,
-        padding: const EdgeInsets.only(
-          top: 120,
-          left: 38,
-          right: 38,
-          bottom: 105,
+        width: screenSize.width,
+        height: screenSize.height,
+        padding: EdgeInsets.symmetric(
+          horizontal: screenSize.width * 0.08,
+          vertical: screenSize.height * 0.1,
         ),
-        clipBehavior: Clip.antiAlias,
         decoration: const BoxDecoration(color: Colors.white),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 309,
-              height: 60,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 158,
-                      height: 60,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const ShapeDecoration(
-                        color: Color(0xFF9747FF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(22),
-                            bottomLeft: Radius.circular(22),
-                          ),
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'My QR',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w800,
-                            height: 0.06,
-                            letterSpacing: 0.10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 151,
-                    top: 0,
-                    child: Container(
-                      width: 158,
-                      height: 60,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF9747FF),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(22),
-                          bottomRight: Radius.circular(22),
-                        ),
-                        border: Border(
-                          left: BorderSide(width: 2),
-                          top: BorderSide(),
-                          right: BorderSide(),
-                          bottom: BorderSide(),
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Scan',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w800,
-                            height: 0.06,
-                            letterSpacing: 0.10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 110),
-            Container(
-              width: 282,
-              height: 282,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage("https://via.placeholder.com/282x282"),
-                  fit: BoxFit.fill,
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildButtonBar(),
+                SizedBox(height: screenSize.height * 0.1),
+                // QR Code Widget
+                QrImage(
+                  data: qrData,
+                  version: QrVersions.auto,
+                  size: qrSize,
+                  gapless: false,
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 100),
-            ElevatedButton(
-              onPressed: () {
-                // Add your logic for the button press
-                Navigator.pop(context); // Example: Navigate back
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-              ),
-              child: const SizedBox(
-                width: 80,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    'Back',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontFamily: 'Ribeye',
-                      fontWeight: FontWeight.w400,
-                      height: 0.04,
-                      letterSpacing: 0.10,
-                    ),
-                  ),
+            // Text Button for 'Back'
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Back',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontFamily: 'Ribeye',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.10,
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonBar() {
+    return SizedBox(
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildButton('My QR', true),
+          _buildButton('Scan', false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, bool isLeft) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF9747FF),
+          borderRadius: BorderRadius.horizontal(
+            left: Radius.circular(isLeft ? 22 : 0),
+            right: Radius.circular(isLeft ? 0 : 22),
+          ),
+          border: isLeft ? null : const Border(left: BorderSide(width: 2)),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.10,
+            ),
+          ),
         ),
       ),
     );
