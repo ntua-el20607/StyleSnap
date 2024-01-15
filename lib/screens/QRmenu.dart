@@ -1,61 +1,44 @@
-/*import 'package:flutter/material.dart';
-// Import the qr_flutter package
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class QRMenuScreen extends StatelessWidget {
-  const QRMenuScreen({super.key});
+  const QRMenuScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final double qrSize = screenSize.width * 0.6;
-
-    // Replace 'yourUniqueUserData' with the actual user data to generate the QR code
-    const String qrData = 'yourUniqueUserData';
-
     return Scaffold(
-      body: Container(
-        width: screenSize.width,
-        height: screenSize.height,
-        padding: EdgeInsets.symmetric(
-          horizontal: screenSize.width * 0.08,
-          vertical: screenSize.height * 0.1,
-        ),
-        decoration: const BoxDecoration(color: Colors.white),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildButtonBar(),
-                SizedBox(height: screenSize.height * 0.1),
-                // QR Code Widget
-                QrImage(
-                  data: qrData,
-                  version: QrVersions.auto,
-                  size: qrSize,
-                  gapless: false,
-                ),
-              ],
-            ),
-            // Text Button for 'Back'
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Back',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontFamily: 'Ribeye',
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.10,
-                ),
+      body: FutureBuilder(
+        future: _getUserData(),
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final String qrData = snapshot.data!['userData'];
+
+            return Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildButtonBar(),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => _generateQRCode(context, qrData),
+                    child: Text('Generate QR Code'),
+                  ),
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Back'),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
@@ -100,4 +83,39 @@ class QRMenuScreen extends StatelessWidget {
       ),
     );
   }
-}*/
+
+  Future<DocumentSnapshot> _getUserData() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    if (auth.currentUser != null) {
+      String userId = auth.currentUser!.uid;
+      return await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+    } else {
+      throw Exception('User not signed in');
+    }
+  }
+
+  Future<void> _generateQRCode(BuildContext context, String qrData) async {
+    try {
+      String barcodeScanResult = await FlutterBarcodeScanner.scanBarcode(
+        '#ff6666', // background color
+        'Cancel', // cancel button text
+        true, // show flash icon (Android only)
+        ScanMode.QR, // scan mode (QR by default)
+      );
+
+      if (barcodeScanResult == '-1') {
+        // User pressed the 'Cancel' button
+        return;
+      }
+
+      // Handle the scanned result, you can use it as needed
+      print('Scanned Result: $barcodeScanResult');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+}

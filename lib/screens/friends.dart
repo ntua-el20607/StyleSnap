@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/profile.dart'; // Import your Profile screen here
 import 'package:stylesnap/screens/changephoto.dart'; // Import your ChangePhoto screen here
 
@@ -160,7 +161,10 @@ class Friends extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const ProfileScreen()),
           );
         } else if (label == "Search") {
-          // Handle navigation for "Search" if needed
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Nearme()),
+          );
         }
       },
       child: Column(

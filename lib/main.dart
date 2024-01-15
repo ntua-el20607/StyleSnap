@@ -10,7 +10,7 @@ import 'firebase_options.dart';
 //import 'package:stylesnap/screens/changephoto.dart';
 //import 'package:stylesnap/screens/Edit_Profile.dart';
 //import 'package:stylesnap/screens/scanQR.dart';
-//import 'package:stylesnap/screens/QRmenu.dart';
+import 'package:stylesnap/screens/QRmenu.dart';
 //import 'package:stylesnap/screens/Profile.dart';
 
 Future<void> main() async {
@@ -32,7 +32,7 @@ class Myapp extends StatelessWidget {
         // You can define the global theme of your app here (optional)
         primarySwatch: Colors.blue,
       ),
-      home: start(), // Set the home to your Login widget
+      home: HomeCasuals(), // Set the home to your Login widget
     );
   }
 }

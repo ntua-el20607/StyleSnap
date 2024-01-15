@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/Post.dart';
+import 'package:stylesnap/screens/friends.dart';
+import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/nearme.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -152,14 +156,53 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildBottomNavigationBar(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
+      width: MediaQuery.of(context).size.width,
+      height: 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavBarItem(context, Icons.home, "Home"),
-          _buildNavBarItem(context, Icons.people, "Friends"),
-          _buildCenterButton(context), // Special button in the middle
-          _buildNavBarItem(context, Icons.search, "Search"),
-          _buildNavBarItem(context, Icons.person, "Profile"),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeCasuals()),
+              );
+            },
+            child: _buildNavBarItem(context, Icons.home, "Home"),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Friends()),
+              );
+            },
+            child: _buildNavBarItem(context, Icons.people, "Friends"),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Post()),
+              );
+            },
+            child: _buildCenterButton(context),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Nearme()),
+              );
+            },
+            child: _buildNavBarItem(context, Icons.search, "Search"),
+          ),
+          GestureDetector(
+            onTap: () {
+              // Current screen, no need to navigate
+            },
+            child: _buildNavBarItem(context, Icons.person, "Profile"),
+          ),
         ],
       ),
     );
@@ -171,22 +214,20 @@ class ProfileScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(icon,
-            color: const Color(
-                0xFF8A56AC)), // Replace with your icon assets and colors
+            color: Colors.purple), // Replace with your icon assets and colors
         Text(label,
             style: const TextStyle(
-                color: Color(0xFF8A56AC))), // Adjust the styling as needed
+                color: Colors.purple)), // Adjust the styling as needed
       ],
     );
   }
 
   Widget _buildCenterButton(BuildContext context) {
     return Container(
-      width: 68, // Diameter of the circle
-      height: 68, // Diameter of the circle
+      width: 57, // Diameter of the circle
+      height: 57, // Diameter of the circle
       decoration: const BoxDecoration(
-        color:
-            Color(0xFF8A56AC), // Replace with the exact purple color you need
+        color: Colors.purple, // Replace with the exact purple color you need
         shape: BoxShape.circle,
       ),
       child: const Icon(Icons.add,

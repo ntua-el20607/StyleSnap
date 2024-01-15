@@ -4,6 +4,7 @@ import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/commets.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homeformals.dart';
+import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -53,33 +54,6 @@ class _HomeCasualsState extends State<HomeCasuals> {
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(context),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Navigate to Post.dart and wait for the result (photo URL)
-          var photoURL = await Navigator.push<String>(
-            context,
-            MaterialPageRoute(builder: (context) => const Post()),
-          );
-
-          // Do something with the photo URL (e.g., save to Firestore, update UI)
-          if (photoURL != null) {
-            print('Received photo URL: $photoURL');
-
-            // You can save the photo URL to Firestore or update the UI
-            // ...
-
-            // Example: Show a snackbar with the photo URL
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Received photo URL: $photoURL'),
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
-        },
-        tooltip: 'Take Picture',
-        child: const Icon(Icons.camera),
-      ),
     );
   }
 
@@ -174,6 +148,11 @@ class _HomeCasualsState extends State<HomeCasuals> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+        } else if (label == "Search") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Nearme()),
           );
         }
       },
