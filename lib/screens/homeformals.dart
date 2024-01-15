@@ -1,9 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/commets.dart';
-import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/friends.dart';
+import 'package:stylesnap/screens/homecasuals.dart'; // Updated import
+import 'package:stylesnap/screens/post.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeFormals extends StatefulWidget {
-  const HomeFormals({super.key});
+  const HomeFormals({Key? key}) : super(key: key);
 
   @override
   _HomeFormalsState createState() => _HomeFormalsState();
@@ -32,76 +37,175 @@ class _HomeFormalsState extends State<HomeFormals> {
             alignment: Alignment.center,
             children: [
               const Text(
-                ' Formals',
+                'Formals', // Updated title
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               Positioned(
-                left: 16.0,
-                child: _buildArrowIcon(),
+                right: 16.0,
+                child: _buildArrowIcon(context),
               ),
             ],
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: 100,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    Image.asset("assets/images/formal.png", fit: BoxFit.cover),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Spacer(), // Spacer on the left
-                          _buildStarRating(index),
-                          const Spacer(), // Spacer on the right for centering the stars
-                          Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: _buildCommentIcon(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+            child: _buildPostsList(),
           ),
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Navigate to Post.dart and wait for the result (photo URL)
+          var photoURL = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (context) => const Post()),
+          );
+
+          // Do something with the photo URL (e.g., save to Firestore, update UI)
+          if (photoURL != null) {
+            print('Received photo URL: $photoURL');
+
+            // You can save the photo URL to Firestore or update the UI
+            // ...
+
+            // Example: Show a snackbar with the photo URL
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Received photo URL: $photoURL'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        },
+        tooltip: 'Take Picture',
+        child: const Icon(Icons.camera),
+      ),
     );
   }
 
+  Stream<List<String>> getPostImages() {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => doc['photo'].toString()).toList();
+    });
+  }
+
+  Widget _buildPostsList() {
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: getPostInfo(),
+      builder: (BuildContext context,
+          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final List<Map<String, dynamic>>? postInfoList = snapshot.data;
+
+        if (postInfoList == null || postInfoList.isEmpty) {
+          return Center(
+            child: Text('No posts yet'),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: postInfoList.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> postInfo = postInfoList[index];
+            String imageURL = postInfo['photoUrl'];
+            return Column(
+              children: [
+                Image.network(imageURL, fit: BoxFit.cover),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Spacer(),
+                      _buildStarRating(index),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: _buildCommentIcon(context),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Stream<List<Map<String, dynamic>>> getPostInfo() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('photos')
+        .where('photoType', isEqualTo: 'Formal') // Updated type
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => {'photoUrl': doc['photoUrl'].toString()})
+          .toList();
+    });
+  }
+
   Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: Colors.purple), // Set the icon color to purple
-        Text(
-          label,
-          style: const TextStyle(
-              color: Colors.purple), // Set the text color to purple
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        if (label == "Friends") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Friends()),
+          );
+        } else if (label == "Profile") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.purple),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.purple),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCenterButton(BuildContext context) {
     return Container(
-      width: 57, // Diameter of the circle
-      height: 57, // Diameter of the circle
+      width: 57,
+      height: 57,
       decoration: const BoxDecoration(
-        color: Colors.purple, // Background color of the button
-        shape: BoxShape.circle, // Circular shape
+        color: Colors.purple,
+        shape: BoxShape.circle,
       ),
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          // Action for your button
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Post()),
+          );
         },
       ),
     );
@@ -127,7 +231,7 @@ class _HomeFormalsState extends State<HomeFormals> {
     );
   }
 
-  Widget _buildCommentIcon() {
+  Widget _buildCommentIcon(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.mode_comment, color: Colors.grey, size: 30.0),
       onPressed: () {
@@ -139,32 +243,29 @@ class _HomeFormalsState extends State<HomeFormals> {
   void _showCommentsScreen(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Set to true for full screen modal
+      isScrollControlled: true,
       builder: (BuildContext bc) {
-        return const Comments(); // Your Comments widget
+        return const Comments();
       },
     );
   }
 
-  Widget _buildArrowIcon() {
+  Widget _buildArrowIcon(BuildContext context) {
     return Container(
-      width: 30, // Adjust size as needed
-      height: 30, // Adjust size as needed
+      width: 30,
+      height: 30,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.purple, width: 2), // Purple border
-        shape: BoxShape.rectangle, // Square shape
+        border: Border.all(color: Colors.purple, width: 2),
+        shape: BoxShape.rectangle,
       ),
       child: IconButton(
-        icon: const Icon(Icons.arrow_back,
-            color: Colors.purple, size: 24), // Adjust icon size as needed
-        padding: EdgeInsets.zero, // Remove any default padding
-        alignment: Alignment.center, // Center the icon
+        icon: const Icon(Icons.arrow_back, color: Colors.purple, size: 24),
+        padding: EdgeInsets.zero,
+        alignment: Alignment.center,
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const HomeCasuals()), // Navigate to HomeCasuals page
+            MaterialPageRoute(builder: (context) => const HomeCasuals()),
           );
         },
       ),

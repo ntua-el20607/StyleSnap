@@ -1,17 +1,29 @@
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/homeformals.dart'; // Add this import
 
 class Post extends StatefulWidget {
-  const Post({super.key});
+  const Post({Key? key}) : super(key: key);
+
   @override
-  _Post createState() => _Post();
+  _PostState createState() => _PostState();
 }
 
-class _Post extends State<Post> {
+class _PostState extends State<Post> {
   CameraController? _controller;
   List<CameraDescription>? _cameras;
   bool _isRearCameraSelected = true;
   bool _isFlashOn = false;
+
+  bool _isCasualButtonPressed = false;
+  bool _isFormalButtonPressed = false;
 
   @override
   void initState() {
@@ -23,10 +35,11 @@ class _Post extends State<Post> {
     _cameras = await availableCameras();
     if (_cameras != null && _cameras!.isNotEmpty) {
       _controller = CameraController(
-          _isRearCameraSelected ? _cameras![0] : _cameras![1],
-          ResolutionPreset.max,
-          enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.jpeg);
+        _isRearCameraSelected ? _cameras![0] : _cameras![1],
+        ResolutionPreset.max,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+      );
       await _controller!.initialize();
       if (!mounted) return;
       setState(() {});
@@ -52,7 +65,76 @@ class _Post extends State<Post> {
   Future<void> _takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
       final XFile photo = await _controller!.takePicture();
-      // Handle the captured photo...
+
+      // Save the photo to Firebase Storage and get the download URL
+      var photoUrl = await _savePhotoToStorage(photo.path);
+
+      // Save the photo URL to Firestore
+      await savePhotoInfoToFirestore(
+          photoUrl, _isCasualButtonPressed ? 'Casual' : 'Formal');
+
+      // Determine the screen to navigate based on the button press
+      if (_isCasualButtonPressed) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeCasuals()),
+        );
+      } else if (_isFormalButtonPressed) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeFormals()),
+        );
+      }
+    }
+  }
+
+  Future<String> _savePhotoToStorage(String photoPath) async {
+    // Implement your logic to save the photo to Firebase Storage
+    // You'll get the download URL after successfully uploading the photo
+    // ...
+
+    // For now, let's assume you have a function that uploads the photo to storage
+    String downloadUrl = await uploadPhotoToStorage(photoPath);
+
+    return downloadUrl;
+  }
+
+  Future<void> savePhotoInfoToFirestore(
+      String photoUrl, String photoType) async {
+    // Get the current user
+    var user = FirebaseAuth.instance.currentUser;
+
+    // Check if the user is logged in
+    if (user != null) {
+      // Save the photo info to the "photos" subcollection
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('photos')
+          .add({
+        'photoUrl': photoUrl,
+        'photoType': photoType,
+        // Other fields...
+      });
+    }
+  }
+
+  Future<String> uploadPhotoToStorage(String photoPath) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageReference = storage.ref().child('photos/$fileName.jpg');
+
+      // Upload the file to Firebase Storage
+      await storageReference.putFile(File(photoPath));
+
+      // Get the download URL
+      String downloadUrl = await storageReference.getDownloadURL();
+
+      return downloadUrl;
+    } catch (error) {
+      print('Error uploading photo: $error');
+      return ''; // Handle the error appropriately in your app
     }
   }
 
@@ -106,14 +188,21 @@ class _Post extends State<Post> {
                         children: [
                           Expanded(
                             child: Container(
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF9747FF),
+                              decoration: BoxDecoration(
+                                color: _isCasualButtonPressed
+                                    ? Colors
+                                        .green // Change the color if pressed
+                                    : const Color(0xFF9747FF),
                                 borderRadius: BorderRadius.horizontal(
-                                    left: Radius.circular(20)),
+                                  left: Radius.circular(20),
+                                ),
                               ),
                               child: TextButton(
                                 onPressed: () {
-                                  // Handle Casual button press
+                                  setState(() {
+                                    _isCasualButtonPressed = true;
+                                    _isFormalButtonPressed = false;
+                                  });
                                 },
                                 child: const Text(
                                   "Casual",
@@ -126,17 +215,24 @@ class _Post extends State<Post> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 2), // Gap between buttons
+                          const SizedBox(width: 2),
                           Expanded(
                             child: Container(
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF9747FF),
+                              decoration: BoxDecoration(
+                                color: _isFormalButtonPressed
+                                    ? Colors
+                                        .green // Change the color if pressed
+                                    : const Color(0xFF9747FF),
                                 borderRadius: BorderRadius.horizontal(
-                                    right: Radius.circular(20)),
+                                  right: Radius.circular(20),
+                                ),
                               ),
                               child: TextButton(
                                 onPressed: () {
-                                  // Handle Formal button press
+                                  setState(() {
+                                    _isCasualButtonPressed = false;
+                                    _isFormalButtonPressed = true;
+                                  });
                                 },
                                 child: const Text(
                                   "Formal",
@@ -158,8 +254,8 @@ class _Post extends State<Post> {
                       color: Colors.grey,
                     ),
                     Expanded(
-                        child:
-                            Container()), // Pushes the camera controls to the bottom
+                      child: Container(),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Row(
