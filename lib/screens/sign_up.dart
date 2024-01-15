@@ -253,23 +253,23 @@ class Signup extends StatelessWidget {
   Future<void> _signUp(BuildContext context) async {
     try {
       if (_areAllFieldsOkay()) {
+        // Create user with Firebase Authentication
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        // Save user data to Firestore
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({
+        String userId = userCredential.user!.uid;
+
+        // Save additional user data to Firestore
+        await FirebaseFirestore.instance.collection('users').doc(userId).set({
           'fullName': _fullNameController.text.trim(),
           'email': _emailController.text.trim(),
           'phoneNumber': _phoneNumberController.text.trim(),
           'username': _usernameController.text.trim(),
-          'password': _passwordController.text.trim(),
           // Add other fields as needed
+          // 'uid': userId, // Uncomment if you want to store the user's UID as well
         });
 
         // Navigate to the login page after successful signup
@@ -281,6 +281,7 @@ class Signup extends StatelessWidget {
     } catch (e) {
       // Handle signup errors...
       print("Error during signup: $e");
+      // Optionally show an error message to the user
     }
   }
 

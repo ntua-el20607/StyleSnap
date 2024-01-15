@@ -1,7 +1,8 @@
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+//import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class QRMenuScreen extends StatelessWidget {
   const QRMenuScreen({super.key});
@@ -9,26 +10,33 @@ class QRMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
+      body: FutureBuilder<DocumentSnapshot>(
         future: _getUserData(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('No user data available'));
           } else {
-            final String qrData = snapshot.data!['userData'];
+            final userData = snapshot.data!.data() as Map<String, dynamic>;
+            final String qrData = userData['uid'] ??
+                'Default Data'; // Replace 'uid' with the appropriate field
 
             return Container(
+              padding: const EdgeInsets.all(20),
+              alignment: Alignment.center,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildButtonBar(),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _generateQRCode(context, qrData),
-                    child: const Text('Generate QR Code'),
-                  ),
+                  // This is where QrImage is used
+                  if (qrData.isNotEmpty)
+                    QrImageView(
+                      data: qrData,
+                      version: QrVersions.auto,
+                      size: 200.0, // Adjust size as needed
+                    ),
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -89,33 +97,18 @@ class QRMenuScreen extends StatelessWidget {
 
     if (auth.currentUser != null) {
       String userId = auth.currentUser!.uid;
-      return await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
+      return FirebaseFirestore.instance.collection('users').doc(userId).get();
     } else {
       throw Exception('User not signed in');
     }
   }
 
-  Future<void> _generateQRCode(BuildContext context, String qrData) async {
-    try {
-      String barcodeScanResult = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666', // background color
-        'Cancel', // cancel button text
-        true, // show flash icon (Android only)
-        ScanMode.QR, // scan mode (QR by default)
-      );
-
-      if (barcodeScanResult == '-1') {
-        // User pressed the 'Cancel' button
-        return;
-      }
-
-      // Handle the scanned result, you can use it as needed
-      print('Scanned Result: $barcodeScanResult');
-    } catch (e) {
-      print('Error: $e');
-    }
+  QrImageView _generateQRCodeWidget(String qrData) {
+    return QrImageView(
+      data: qrData,
+      version: QrVersions.auto,
+      size: 200.0, // Adjust size as needed
+      gapless: false,
+    );
   }
 }
