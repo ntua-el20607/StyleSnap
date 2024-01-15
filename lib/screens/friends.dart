@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/commets.dart';
+import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/profile.dart'; // Import your Profile screen here
+import 'package:stylesnap/screens/changephoto.dart'; // Import your ChangePhoto screen here
 
 class ScrollableImageRow extends StatelessWidget {
-  const ScrollableImageRow({super.key});
+  const ScrollableImageRow({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +20,8 @@ class ScrollableImageRow extends StatelessWidget {
             child: Column(
               children: [
                 Image.asset(
-                    'assets/images/ruklas.png'), // Replace with dynamic image path
+                  'assets/images/ruklas.png',
+                ), // Replace with dynamic image path
                 const Text(
                   'ruklas',
                   style: TextStyle(
@@ -33,7 +38,7 @@ class ScrollableImageRow extends StatelessWidget {
 }
 
 class Friends extends StatelessWidget {
-  const Friends({super.key});
+  const Friends({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -142,17 +147,36 @@ class Friends extends StatelessWidget {
   }
 
   Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: Colors.purple), // Set the icon color to purple
-        Text(
-          label,
-          style: const TextStyle(
-              color: Colors.purple), // Set the text color to purple
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        // Handle navigation based on the selected icon
+        if (label == "Home") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeCasuals()),
+          );
+        } else if (label == "Profile") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+        } else if (label == "Search") {
+          // Handle navigation for "Search" if needed
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.purple), // Set the icon color to purple
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.purple,
+            ), // Set the text color to purple
+          ),
+        ],
+      ),
     );
   }
 
@@ -167,7 +191,12 @@ class Friends extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          // Action for your button
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    const ChangePhotoScreen()), // Navigate to ChangePhoto screen
+          );
         },
       ),
     );
