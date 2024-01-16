@@ -3,14 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/Edit_Profile.dart';
 import 'package:stylesnap/screens/Post.dart';
-import 'package:stylesnap/screens/QRmenu.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/scanQR.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -134,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => EditProfileScreen()),
+            MaterialPageRoute(builder: (context) => const EditProfileScreen()),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -187,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTotalOutfitsCount() {
-    return Center(
+    return const Center(
       child: Text(
         '70',
         style: TextStyle(
@@ -215,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         icon: const Icon(Icons.qr_code),
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ScanQRScreen()),
+            MaterialPageRoute(builder: (context) => const ScanQRScreen()),
           );
         },
       ),

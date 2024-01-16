@@ -226,7 +226,7 @@ class _NearmeState extends State<Nearme> {
             borderSide: BorderSide.none,
           ),
           suffixIcon: IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               onSearch(searchController.text);
             },
@@ -295,7 +295,7 @@ class _NearmeState extends State<Nearme> {
     } else {
       // Show an error or a message saying user not found
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('User not found'),
           backgroundColor: Colors.red,
         ),

@@ -48,7 +48,7 @@ class ScanQRScreen extends StatelessWidget {
             _buildButton('My QR', true, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => QRMenuScreen()),
+                MaterialPageRoute(builder: (context) => const QRMenuScreen()),
               );
             }),
             _buildButton('Scan', false, () {

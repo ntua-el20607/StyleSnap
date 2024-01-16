@@ -3,7 +3,7 @@ import 'package:stylesnap/screens/Post.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/profile.dart'; // Import your Profile screen here
-import 'package:stylesnap/screens/changephoto.dart'; // Import your ChangePhoto screen here
+// Import your ChangePhoto screen here
 
 class ScrollableImageRow extends StatelessWidget {
   const ScrollableImageRow({super.key});

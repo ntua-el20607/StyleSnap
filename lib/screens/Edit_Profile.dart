@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  const EditProfileScreen({super.key});
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -178,7 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
           },
           style: ElevatedButton.styleFrom(
-            primary: Colors.transparent,
+            backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
           ),
           child: const Text(
