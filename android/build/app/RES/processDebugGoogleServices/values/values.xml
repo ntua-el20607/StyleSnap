@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">612376194301</string>
+    <string name="google_api_key" translatable="false">AIzaSyDNtuTN1m9alsyJ3WMEyTXTxMRQh3M-lgo</string>
+    <string name="google_app_id" translatable="false">1:612376194301:android:e96764838f50245e7a2294</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDNtuTN1m9alsyJ3WMEyTXTxMRQh3M-lgo</string>
+    <string name="google_storage_bucket" translatable="false">stylesnap.appspot.com</string>
+    <string name="project_id" translatable="false">stylesnap</string>
+</resources>

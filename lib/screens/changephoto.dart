@@ -1,8 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChangePhotoScreen extends StatefulWidget {
-  const ChangePhotoScreen({super.key});
+  const ChangePhotoScreen({Key? key, required this.onPhotoTaken})
+      : super(key: key);
+
+  final Function(String?) onPhotoTaken;
+
   @override
   _ChangePhotoScreenState createState() => _ChangePhotoScreenState();
 }
@@ -52,7 +61,27 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
   Future<void> _takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
       final XFile photo = await _controller!.takePicture();
-      // Handle the captured photo...
+
+      // Upload photo to Firebase Storage
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final storageRef =
+          FirebaseStorage.instance.ref().child('profile_pictures/$userId.jpg');
+      await storageRef.putFile(File(photo.path));
+
+      // Get download URL
+      final downloadUrl = await storageRef.getDownloadURL();
+
+      // Save download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'profilePictureUrl': downloadUrl});
+
+      // Trigger the callback with the photo path
+      widget.onPhotoTaken(downloadUrl);
+
+      // Navigate back to ProfileScreen after taking a photo
+      Navigator.pop(context);
     }
   }
 
@@ -92,8 +121,7 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
                         color: Colors.grey,
                       ),
                     ),
-                    Expanded(
-                        child: Container()), // Pushes the row to the bottom
+                    Expanded(child: Container()),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Row(
@@ -116,6 +144,11 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
                                 shape: BoxShape.circle,
                                 border:
                                     Border.all(color: Colors.white, width: 4),
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 30,
                               ),
                             ),
                           ),

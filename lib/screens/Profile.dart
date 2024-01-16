@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/Edit_Profile.dart';
 import 'package:stylesnap/screens/Post.dart';
@@ -7,8 +9,41 @@ import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/scanQR.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? _profilePictureUrl;
+  String? _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      final username = userDoc['username'];
+
+      setState(() {
+        _profilePictureUrl = userDoc['profilePictureUrl'];
+        _username = username;
+      });
+    } catch (e) {
+      print('Error loading profile data: $e'); // Add this line for debugging
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,26 +52,19 @@ class ProfileScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Adjust spacing as needed
               _buildLogoGramata(context),
               const SizedBox(height: 35),
               _buildProfileImage(),
-              const SizedBox(height: 10), // Space between image and text
-              const Text(
-                'Ruklas',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10), // Space between text and button
+              const SizedBox(height: 10),
+              _buildUsername(), // Display the username
+              const SizedBox(height: 10),
               _buildEditProfileButton(context),
               const SizedBox(height: 20),
               _buildDivider(),
               _buildTotalOutfitsSection(context),
-              const SizedBox(height: 50),
+              const SizedBox(height: 30),
               _buildTotalOutfitsCount(),
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               _buildDivider(),
               _buildQRButton(context),
             ],
@@ -67,9 +95,31 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileImage() {
-    return const CircleAvatar(
-      radius: 71, // Adjust size as needed
-      backgroundImage: AssetImage("assets/images/ruklas.png"),
+    return ClipOval(
+      child: SizedBox(
+        width: 150,
+        height: 150,
+        child: _profilePictureUrl != null
+            ? Image.network(
+                _profilePictureUrl!,
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                "assets/images/profile_pic.png", // Default profile picture
+                fit: BoxFit.cover,
+              ),
+      ),
+    );
+  }
+
+  Widget _buildUsername() {
+    return Text(
+      _username ?? '', // Use the fetched username, default to an empty string
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
     );
   }
 
@@ -90,21 +140,27 @@ class ProfileScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF9747FF),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(15),
           ),
           padding: const EdgeInsets.symmetric(
               vertical: 15), // Adjust padding as needed
         ),
         child: const Text(
           'Edit Profile',
-          style: TextStyle(color: Colors.white), // Text color set to white
+          style: TextStyle(
+            color: Colors.white, // Text color set to white
+            fontSize: 20, // Increase the font size
+          ),
         ),
       ),
     );
   }
 
   Widget _buildDivider() {
-    return const Divider(color: Color(0xFFD9D9D9));
+    return Container(
+      margin: const EdgeInsets.only(top: 5), // Adjust the top margin as needed
+      child: const Divider(color: Color(0xFFD9D9D9)),
+    );
   }
 
   Widget _buildTotalOutfitsSection(BuildContext context) {
@@ -131,32 +187,38 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildTotalOutfitsCount() {
-    return const Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding:
-            EdgeInsets.symmetric(horizontal: 16), // Adjust padding as needed
-        child: Text(
-          'Total Outfits:       70',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w400,
-          ),
+    return Center(
+      child: Text(
+        '70',
+        style: TextStyle(
+          color: Colors.purple,
+          fontSize: 30,
+          fontWeight: FontWeight.w600,
+          shadows: [
+            Shadow(
+              color: Colors.black,
+              offset: Offset(3, 3),
+              blurRadius: 2,
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildQRButton(BuildContext context) {
-    return IconButton(
-      iconSize: 40, // Increase the icon size
-      icon: const Icon(Icons.qr_code),
-      onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => ScanQRScreen()),
-        );
-      },
+    return Padding(
+      padding:
+          const EdgeInsets.only(top: 20), // Adjust the top padding as needed
+      child: IconButton(
+        iconSize: 100, // Increase the icon size
+        icon: const Icon(Icons.qr_code),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ScanQRScreen()),
+          );
+        },
+      ),
     );
   }
 
