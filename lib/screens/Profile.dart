@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/Edit_Profile.dart';
 import 'package:stylesnap/screens/Post.dart';
@@ -7,8 +9,32 @@ import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/scanQR.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? _profilePictureUrl; // New variable to store profile picture URL
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfilePicture(); // Load profile picture URL when the screen is created
+  }
+
+  // Function to load the profile picture URL from Firestore
+  Future<void> _loadProfilePicture() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    setState(() {
+      _profilePictureUrl = userDoc['profilePictureUrl'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +93,20 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileImage() {
-    return const CircleAvatar(
-      radius: 71, // Adjust size as needed
-      backgroundImage: AssetImage("assets/images/ruklas.png"),
+    return ClipOval(
+      child: SizedBox(
+        width: 150,
+        height: 150,
+        child: _profilePictureUrl != null
+            ? Image.network(
+                _profilePictureUrl!,
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                "assets/images/profile_pic.png", // Default profile picture
+                fit: BoxFit.cover,
+              ),
+      ),
     );
   }
 

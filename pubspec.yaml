@@ -26,6 +26,7 @@ dependencies:
   barcode: ^2.2.6
   flutter_barcode_scanner: ^2.0.0
   path_provider: ^2.1.2
+  provider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +54,7 @@ flutter:
     - assets/images/logo_gramata.png
     - assets/images/formal.png
     - assets/images/casual.png
+    - assets/images/profile_pic.png
 
   fonts:
     - family: Ribeye

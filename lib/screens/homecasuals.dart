@@ -9,17 +9,7 @@ import 'package:stylesnap/screens/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeCasuals extends StatefulWidget {
-  final String fullName;
-  final String email;
-  final String phoneNumber;
-  final String username;
-
-  const HomeCasuals({
-    required this.fullName,
-    required this.email,
-    required this.phoneNumber,
-    required this.username,
-  });
+  const HomeCasuals({super.key});
 
   @override
   _HomeCasualsState createState() => _HomeCasualsState();

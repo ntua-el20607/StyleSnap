@@ -3,7 +3,7 @@ import 'package:stylesnap/screens/changephoto.dart';
 import 'package:stylesnap/screens/start.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  const EditProfileScreen({Key? key}) : super(key: key);
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -18,8 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       TextEditingController(text: '+307777777777');
   final TextEditingController _passwordController =
       TextEditingController(text: 'john22john');
-
-  // ... [Keep your existing methods here]
+  String _profileImagePath = 'assets/images/ruklas.png';
 
   @override
   Widget build(BuildContext context) {
@@ -84,44 +83,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     print("Delete account button pressed"); // Optional: for debugging
   }
 
+  void updateProfilePicture(String imagePath) {
+    setState(() {
+      _profileImagePath = imagePath;
+    });
+  }
+
   Widget buildProfilePicture() {
-    return Stack(
-      alignment: Alignment.center,
+    return Column(
       children: [
-        Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(width: 0.50),
-            image: const DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage('assets/images/ruklas.png'), // Your image path
-            ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ChangePhotoScreen(
+                  onPhotoTaken: (imagePath) {
+                    updateProfilePicture(imagePath!);
+                    Navigator.pop(context); // Close the ChangePhotoScreen
+                  },
+                ),
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            primary: Colors.transparent,
+            shadowColor: Colors.transparent,
           ),
-        ),
-        Positioned(
-          right: 4,
-          bottom: 4,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const ChangePhotoScreen()),
-              );
-            },
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.photo_camera,
-                size: 20,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
+          child: const Text(
+            'Change Profile Picture',
+            style: TextStyle(fontSize: 18, color: Colors.blue),
           ),
         ),
       ],
@@ -131,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget buildEditableInfoContainer(
       String title, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10), // Added padding for spacing
+      padding: const EdgeInsets.only(top: 30), // Added padding for spacing
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
