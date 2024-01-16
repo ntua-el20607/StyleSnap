@@ -22,10 +22,23 @@ class friendprof extends StatelessWidget {
     required this.username,
   }) : super(key: key);
 
+  Future<String?> _getUserProfilePictureUrl(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      return userDoc['profilePictureUrl'];
+    } catch (e) {
+      print('Error fetching user profile picture: $e');
+      return null;
+    }
+  }
+
   Future<void> _removeFriend(BuildContext context) async {
     String currentUserId = getCurrentUserId();
     if (currentUserId.isEmpty) {
-      // Handle the case where there is no logged-in user
       return;
     }
 
@@ -35,12 +48,10 @@ class friendprof extends StatelessWidget {
         .update({
       'friends': FieldValue.arrayRemove([userId])
     }).then((_) {
-      // Show a confirmation message or update the UI
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Friend removed successfully!')),
       );
     }).catchError((error) {
-      // Handle any errors here
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error removing friend: $error')),
       );
@@ -54,33 +65,26 @@ class friendprof extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We use MediaQuery to get the height and subtract the status bar height if necessary.
     double screenHeight =
         MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
 
     return Scaffold(
       body: SafeArea(
-        // Added SafeArea for proper spacing at the top
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildLogoGramata(),
-            SizedBox(
-                height: screenHeight * 0.03), // 3% of screen height for spacing
+            SizedBox(height: screenHeight * 0.03),
             _buildProfilePicture(username),
-            SizedBox(
-                height: screenHeight * 0.03), // 3% of screen height for spacing
+            SizedBox(height: screenHeight * 0.03),
             _buildActionButton(fullName),
-            SizedBox(
-                height: screenHeight * 0.05), // 5% of screen height for spacing
+            SizedBox(height: screenHeight * 0.05),
             _buildActionButton(email),
-            SizedBox(
-                height: screenHeight * 0.05), // 5% of screen height for spacing
+            SizedBox(height: screenHeight * 0.05),
             _buildActionButton(phoneNumber),
-            SizedBox(
-                height: screenHeight * 0.05), // 5% of screen height for spacing
+            SizedBox(height: screenHeight * 0.05),
             _buildRemoveFriendButton(context),
-            const Spacer(), // Pushes the navigation bar to the bottom
+            const Spacer(),
             _buildBottomNavigationBar(context),
           ],
         ),
@@ -96,8 +100,7 @@ class friendprof extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/logo_gramata.png'),
-            fit: BoxFit
-                .contain, // This will fill the entire box with the image, possibly distorting the aspect ratio
+            fit: BoxFit.contain,
           ),
         ),
       ),
@@ -105,6 +108,23 @@ class friendprof extends StatelessWidget {
   }
 
   Widget _buildProfilePicture(String username) {
+    return FutureBuilder<String?>(
+      future: _getUserProfilePictureUrl(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError || snapshot.data == null) {
+            return _defaultProfilePicture(username);
+          } else {
+            return _userProfilePicture(snapshot.data!);
+          }
+        } else {
+          return _defaultProfilePicture(username);
+        }
+      },
+    );
+  }
+
+  Widget _defaultProfilePicture(String username) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -114,19 +134,43 @@ class friendprof extends StatelessWidget {
           width: 142,
           height: 142.29,
           decoration: const ShapeDecoration(
-            shape: CircleBorder(), // Circle shape for the profile picture
+            shape: CircleBorder(),
             image: DecorationImage(
               image: AssetImage('assets/images/ruklas.png'),
-              fit: BoxFit.cover, // Ensures the image covers the container
+              fit: BoxFit.cover,
             ),
           ),
         ),
-        const SizedBox(height: 10), // Space between the image and the text
+        const SizedBox(height: 10),
         Text(
           username,
-          style: TextStyle(
-              // Define this style as per your design requirements
-              ),
+          style: TextStyle(),
+        ),
+      ],
+    );
+  }
+
+  Widget _userProfilePicture(String profilePictureUrl) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 142,
+          height: 142.29,
+          decoration: ShapeDecoration(
+            shape: CircleBorder(),
+            image: DecorationImage(
+              image: NetworkImage(profilePictureUrl),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          username,
+          style: TextStyle(),
         ),
       ],
     );
@@ -143,15 +187,11 @@ class friendprof extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             side: const BorderSide(width: 2, color: Color(0xFF9747FF)),
           ),
-          // Other properties...
         ),
         child: Center(
-          // Center the text inside the container
           child: Text(
             text,
-            style: const TextStyle(
-                // Define this style as a constant if reused
-                ),
+            style: const TextStyle(),
           ),
         ),
       ),

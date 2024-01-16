@@ -47,6 +47,22 @@ class addfriend extends StatelessWidget {
     });
   }
 
+  Future<String> _getProfilePictureUrl(String userId) async {
+    try {
+      // Fetch user document from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      // Get the profilePictureUrl field from the document
+      return userDoc['profilePictureUrl'] ?? '';
+    } catch (e) {
+      print('Error fetching profile picture URL: $e');
+      return ''; // Return an empty string or a default URL in case of an error
+    }
+  }
+
   String getCurrentUserId() {
     final user = FirebaseAuth.instance.currentUser;
     return user != null ? user.uid : '';
@@ -67,7 +83,7 @@ class addfriend extends StatelessWidget {
             _buildLogoGramata(),
             SizedBox(
                 height: screenHeight * 0.03), // 3% of screen height for spacing
-            _buildProfilePicture(username),
+            _buildProfilePicture(username, userId),
             SizedBox(
                 height: screenHeight * 0.03), // 3% of screen height for spacing
             _buildActionButton(fullName),
@@ -104,31 +120,50 @@ class addfriend extends StatelessWidget {
     );
   }
 
-  Widget _buildProfilePicture(String username) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 142,
-          height: 142.29,
-          decoration: const ShapeDecoration(
-            shape: CircleBorder(), // Circle shape for the profile picture
-            image: DecorationImage(
-              image: AssetImage('assets/images/ruklas.png'),
-              fit: BoxFit.cover, // Ensures the image covers the container
-            ),
-          ),
-        ),
-        const SizedBox(height: 10), // Space between the image and the text
-        Text(
-          username,
-          style: TextStyle(
-              // Define this style as per your design requirements
+  Widget _buildProfilePicture(String username, String userId) {
+    return FutureBuilder(
+      future: _getProfilePictureUrl(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // While waiting for the data, show a loading indicator or placeholder
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // If an error occurs, handle it accordingly
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          // If data is available, display the profile picture
+          String profilePictureUrl = snapshot.data.toString();
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 142,
+                height: 142.29,
+                decoration: ShapeDecoration(
+                  shape: CircleBorder(), // Circle shape for the profile picture
+                  image: DecorationImage(
+                    image: NetworkImage(profilePictureUrl),
+                    fit: BoxFit.cover, // Ensures the image covers the container
+                  ),
+                ),
               ),
-        ),
-      ],
+              const SizedBox(
+                  height: 10), // Space between the image and the text
+              Text(
+                username,
+                style: TextStyle(
+                    // Define this style as per your design requirements
+                    ),
+              ),
+            ],
+          );
+        } else {
+          // Handle the case where no data is available
+          return Text('No data available');
+        }
+      },
     );
   }
 
