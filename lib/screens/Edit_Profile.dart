@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stylesnap/screens/changephoto.dart';
 import 'package:stylesnap/screens/start.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -10,15 +12,54 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final TextEditingController _usernameController =
-      TextEditingController(text: 'John22');
-  final TextEditingController _emailController =
-      TextEditingController(text: 'john22@gmail.com');
-  final TextEditingController _phoneController =
-      TextEditingController(text: '+307777777777');
-  final TextEditingController _passwordController =
-      TextEditingController(text: 'john22john');
-  String _profileImagePath = 'assets/images/ruklas.png';
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String? _profilePictureUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      setState(() {
+        _profilePictureUrl = userDoc['profilePictureUrl'];
+        _usernameController.text = userDoc['username'] ?? '';
+        _emailController.text = userDoc['email'] ?? '';
+        _phoneController.text = userDoc['phoneNumber'] ?? '';
+        _passwordController.text = userDoc['password'] ?? '';
+      });
+    } catch (e) {
+      print('Error loading profile data: $e');
+    }
+  }
+
+  Future<void> _updateProfileData() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'username': _usernameController.text,
+        'email': _emailController.text,
+        'phoneNumber': _phoneController.text,
+        'password': _passwordController.text,
+      });
+
+      // Optionally, you can reload the profile data after updating
+      await _loadProfileData();
+    } catch (e) {
+      print('Error updating profile data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,17 +82,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
+                    _buildProfileImage(),
+                    const SizedBox(height: 10),
                     buildProfilePicture(),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     buildEditableInfoContainer("Username", _usernameController),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     buildEditableInfoContainer("Email", _emailController),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     buildEditableInfoContainer(
                         "Phone Number", _phoneController),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     buildEditableInfoContainer("Password", _passwordController),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -74,19 +117,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void onSavePressed() {
-    // Placeholder for future implementation
-    print("Save button pressed"); // Optional: for debugging
+    _updateProfileData();
   }
 
-  void onDeleteAccountPressed() {
-    // Placeholder for future implementation
-    print("Delete account button pressed"); // Optional: for debugging
+  void onDeleteAccountPressed() async {
+    try {
+      // Get the current user
+      final user = FirebaseAuth.instance.currentUser;
+
+      // Get the user ID
+      final userId = user!.uid;
+
+      // Delete the user document from Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+      // Delete the user account
+      await user.delete();
+
+      // Navigate to the StartPage
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const start()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Error deleting account: $e');
+    }
   }
 
-  void updateProfilePicture(String imagePath) {
-    setState(() {
-      _profileImagePath = imagePath;
-    });
+  Widget _buildProfileImage() {
+    return ClipOval(
+      child: SizedBox(
+        width: 150,
+        height: 150,
+        child: _profilePictureUrl != null
+            ? Image.network(
+                _profilePictureUrl!,
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                "assets/images/profile_pic.png", // Default profile picture
+                fit: BoxFit.cover,
+              ),
+      ),
+    );
   }
 
   Widget buildProfilePicture() {
@@ -98,7 +171,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               MaterialPageRoute(
                 builder: (context) => ChangePhotoScreen(
                   onPhotoTaken: (imagePath) {
-                    updateProfilePicture(imagePath!);
                     Navigator.pop(context); // Close the ChangePhotoScreen
                   },
                 ),
