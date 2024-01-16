@@ -7,8 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChangePhotoScreen extends StatefulWidget {
-  const ChangePhotoScreen({Key? key, required this.onPhotoTaken})
-      : super(key: key);
+  const ChangePhotoScreen({super.key, required this.onPhotoTaken});
 
   final Function(String?) onPhotoTaken;
 
@@ -145,7 +144,7 @@ class _ChangePhotoScreenState extends State<ChangePhotoScreen> {
                                 border:
                                     Border.all(color: Colors.white, width: 4),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.camera_alt,
                                 color: Colors.white,
                                 size: 30,

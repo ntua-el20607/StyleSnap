@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:location/location.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -63,27 +63,36 @@ class _PostState extends State<Post> {
 
   Future<void> _takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
-      // Check if either Casual or Formal button is pressed
       if (_isCasualButtonPressed || _isFormalButtonPressed) {
         final XFile photo = await _controller!.takePicture();
 
-        // Save the photo to Firebase Storage and get the download URL
-        var photoUrl = await _savePhotoToStorage(photo.path);
+        // Capture current location
+        LocationData? currentLocation = await _getCurrentLocation();
+        if (currentLocation != null) {
+          // Save the photo to Firebase Storage and get the download URL
+          var photoUrl = await _savePhotoToStorage(photo.path);
 
-        // Save the photo URL to Firestore
-        await savePhotoInfoToFirestore(
-            photoUrl, _isCasualButtonPressed ? 'Casual' : 'Formal');
+          // Save the photo URL and location to Firestore
+          await savePhotoInfoToFirestore(photoUrl,
+              _isCasualButtonPressed ? 'Casual' : 'Formal', currentLocation);
 
-        // Determine the screen to navigate based on the button press
-        if (_isCasualButtonPressed) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeCasuals()),
-          );
-        } else if (_isFormalButtonPressed) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeFormals()),
+          // Navigate based on the button press
+          if (_isCasualButtonPressed) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeCasuals()),
+            );
+          } else if (_isFormalButtonPressed) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeFormals()),
+            );
+          }
+        } else {
+          // Handle the case where location is not available or permission is denied
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Unable to get location. Please try again.')),
           );
         }
       } else {
@@ -111,23 +120,34 @@ class _PostState extends State<Post> {
   }
 
   Future<void> savePhotoInfoToFirestore(
-      String photoUrl, String photoType) async {
-    // Get the current user
+      String photoUrl, String photoType, LocationData locationData) async {
     var user = FirebaseAuth.instance.currentUser;
 
-    // Check if the user is logged in
     if (user != null) {
-      // Save the photo info to the "photos" subcollection
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('photos')
-          .add({
-        'photoUrl': photoUrl,
+      await FirebaseFirestore.instance.collection('posts').add({
+        'userId': user.uid,
+        'imageUrl': photoUrl,
         'photoType': photoType,
-        // Other fields...
+        'timestamp': FieldValue.serverTimestamp(),
+        'location': GeoPoint(locationData.latitude!, locationData.longitude!),
       });
     }
+  }
+
+  Future<LocationData?> _getCurrentLocation() async {
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return null;
+      }
+    }
+    return await location.getLocation();
   }
 
   Future<String> uploadPhotoToStorage(String photoPath) async {

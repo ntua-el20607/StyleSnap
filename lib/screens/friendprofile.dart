@@ -14,7 +14,7 @@ class friendprof extends StatelessWidget {
   final String username;
 
   const friendprof({
-    Key? key,
+    super.key,
     required this.userId,
     required this.fullName,
     required this.email,
@@ -49,7 +49,7 @@ class friendprof extends StatelessWidget {
       'friends': FieldValue.arrayRemove([userId])
     }).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Friend removed successfully!')),
+        const SnackBar(content: Text('Friend removed successfully!')),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(

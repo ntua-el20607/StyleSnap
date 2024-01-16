@@ -14,13 +14,13 @@ class addfriend extends StatelessWidget {
   final String username;
 
   const addfriend({
-    Key? key,
+    super.key,
     required this.userId,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
     required this.username,
-  }) : super(key: key);
+  });
 
   Future<void> _addfriend(BuildContext context) async {
     String currentUserId = getCurrentUserId(); // Get the current user's ID
@@ -37,7 +37,7 @@ class addfriend extends StatelessWidget {
     }).then((_) {
       // Show a confirmation message or update the UI
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Friend added successfully!')),
+        const SnackBar(content: Text('Friend added successfully!')),
       );
     }).catchError((error) {
       // Handle any errors here
