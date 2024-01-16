@@ -20,7 +20,7 @@ class friendprof extends StatelessWidget {
     required this.email,
     required this.phoneNumber,
     required this.username,
-  }) : super(key: key);
+  });
 
   Future<String?> _getUserProfilePictureUrl(String userId) async {
     try {
@@ -144,7 +144,7 @@ class friendprof extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           username,
-          style: TextStyle(),
+          style: const TextStyle(),
         ),
       ],
     );
@@ -160,7 +160,7 @@ class friendprof extends StatelessWidget {
           width: 142,
           height: 142.29,
           decoration: ShapeDecoration(
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             image: DecorationImage(
               image: NetworkImage(profilePictureUrl),
               fit: BoxFit.cover,
@@ -170,7 +170,7 @@ class friendprof extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           username,
-          style: TextStyle(),
+          style: const TextStyle(),
         ),
       ],
     );

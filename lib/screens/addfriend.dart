@@ -126,7 +126,7 @@ class addfriend extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While waiting for the data, show a loading indicator or placeholder
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           // If an error occurs, handle it accordingly
           return Text('Error: ${snapshot.error}');
@@ -142,7 +142,7 @@ class addfriend extends StatelessWidget {
                 width: 142,
                 height: 142.29,
                 decoration: ShapeDecoration(
-                  shape: CircleBorder(), // Circle shape for the profile picture
+                  shape: const CircleBorder(), // Circle shape for the profile picture
                   image: DecorationImage(
                     image: NetworkImage(profilePictureUrl),
                     fit: BoxFit.cover, // Ensures the image covers the container
@@ -153,7 +153,7 @@ class addfriend extends StatelessWidget {
                   height: 10), // Space between the image and the text
               Text(
                 username,
-                style: TextStyle(
+                style: const TextStyle(
                     // Define this style as per your design requirements
                     ),
               ),
@@ -161,7 +161,7 @@ class addfriend extends StatelessWidget {
           );
         } else {
           // Handle the case where no data is available
-          return Text('No data available');
+          return const Text('No data available');
         }
       },
     );

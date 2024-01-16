@@ -62,7 +62,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
         .collection('posts')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => doc['photo'].toString()).toList();
+      return snapshot.docs.map((doc) => doc['photos'].toString()).toList();
     });
   }
 
@@ -72,9 +72,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
       builder: (BuildContext context,
           AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          );
+          return Text('giasas egw ime exi error: ${snapshot.error}');
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -95,10 +93,27 @@ class _HomeCasualsState extends State<HomeCasuals> {
           itemCount: postInfoList.length,
           itemBuilder: (context, index) {
             Map<String, dynamic> postInfo = postInfoList[index];
-            String imageURL = postInfo['photoUrl'];
+            print("Post Info: $postInfo"); // This will log the entire map
+
+            String? imageUrl = postInfo['imageUrl'] as String?;
+            if (imageUrl == null) {
+              print("Image URL is null for post index $index");
+              imageUrl = 'default_image_url_here'; // handle null URL
+            }
             return Column(
               children: [
-                Image.network(imageURL, fit: BoxFit.cover),
+                Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace? stackTrace) {
+                    print("Image URL: $imageUrl");
+
+                    print('Image load error: $exception'); // Log the error
+                    return Text(
+                        'Failed to load image'); // Placeholder text or widget
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
@@ -122,19 +137,51 @@ class _HomeCasualsState extends State<HomeCasuals> {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getPostInfo() {
-    return FirebaseFirestore.instance
+  Stream<List<Map<String, dynamic>>> getPostInfo() async* {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      yield [];
+      return;
+    }
+
+    // Fetch the current user's friends list
+    var userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('photos')
+        .doc(currentUser.uid)
+        .get();
+    List<dynamic> friends = userDoc.data()?['friends'] ?? [];
+
+    // Add the current user's ID to the list to fetch their posts as well
+    friends.add(currentUser.uid);
+
+    // Check if the friends list is empty
+    if (friends.isEmpty) {
+      yield [];
+      return;
+    }
+
+    // If the friends list is too long for a 'whereIn' query, consider an alternative approach
+    // ...
+
+    // Proceed with the query if the friends list is not empty
+    yield* FirebaseFirestore.instance
+        .collection('posts')
         .where('photoType', isEqualTo: 'Casual')
+        .where('userId',
+            whereIn:
+                friends) // Filter by friends' userIds and the user's own ID
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => {'photoUrl': doc['photoUrl'].toString()})
+          .map((doc) => {
+                'imageUrl': doc.data()['imageUrl'].toString(),
+                // Include other post fields you might need
+              })
           .toList();
     });
   }
+
+  // Listen to the posts collection
 
   Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
     return GestureDetector(
