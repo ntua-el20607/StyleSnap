@@ -20,7 +20,7 @@ class friendprof extends StatelessWidget {
     required this.email,
     required this.phoneNumber,
     required this.username,
-  }) : super(key: key);
+  });
 
   Future<String?> _getUserProfilePictureUrl(String userId) async {
     try {
