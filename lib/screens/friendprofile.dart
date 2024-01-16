@@ -1,7 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stylesnap/screens/Post.dart';
+import 'package:stylesnap/screens/Profile.dart';
+import 'package:stylesnap/screens/friends.dart';
+import 'package:stylesnap/screens/homecasuals.dart';
 
 class friendprof extends StatelessWidget {
-  const friendprof({super.key});
+  final String userId;
+  final String fullName;
+  final String email;
+  final String phoneNumber;
+  final String username;
+
+  const friendprof({
+    Key? key,
+    required this.userId,
+    required this.fullName,
+    required this.email,
+    required this.phoneNumber,
+    required this.username,
+  }) : super(key: key);
+
+  Future<void> _removeFriend(BuildContext context) async {
+    String currentUserId = getCurrentUserId();
+    if (currentUserId.isEmpty) {
+      // Handle the case where there is no logged-in user
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .update({
+      'friends': FieldValue.arrayRemove([userId])
+    }).then((_) {
+      // Show a confirmation message or update the UI
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Friend removed successfully!')),
+      );
+    }).catchError((error) {
+      // Handle any errors here
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error removing friend: $error')),
+      );
+    });
+  }
+
+  String getCurrentUserId() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user != null ? user.uid : '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +67,19 @@ class friendprof extends StatelessWidget {
             _buildLogoGramata(),
             SizedBox(
                 height: screenHeight * 0.03), // 3% of screen height for spacing
-            _buildProfilePicture(),
+            _buildProfilePicture(username),
             SizedBox(
                 height: screenHeight * 0.03), // 3% of screen height for spacing
-            _buildActionButton("GiorgakisThePresident"),
+            _buildActionButton(fullName),
             SizedBox(
                 height: screenHeight * 0.05), // 5% of screen height for spacing
-            _buildActionButton("georgebush@gmail.com"),
+            _buildActionButton(email),
             SizedBox(
                 height: screenHeight * 0.05), // 5% of screen height for spacing
-            _buildActionButton("+13727267482"),
+            _buildActionButton(phoneNumber),
             SizedBox(
                 height: screenHeight * 0.05), // 5% of screen height for spacing
-            _buildRemoveFriendButton(),
+            _buildRemoveFriendButton(context),
             const Spacer(), // Pushes the navigation bar to the bottom
             _buildBottomNavigationBar(context),
           ],
@@ -55,7 +104,7 @@ class friendprof extends StatelessWidget {
     );
   }
 
-  Widget _buildProfilePicture() {
+  Widget _buildProfilePicture(String username) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -73,8 +122,8 @@ class friendprof extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10), // Space between the image and the text
-        const Text(
-          'George Bush',
+        Text(
+          username,
           style: TextStyle(
               // Define this style as per your design requirements
               ),
@@ -111,56 +160,106 @@ class friendprof extends StatelessWidget {
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return Container(
-      color: Theme.of(context)
-          .scaffoldBackgroundColor, // Change this to the color of your page's background
-      width: 429, // This will take the full width of the screen
-      height: 90, // The height you want
+      color: Theme.of(context).scaffoldBackgroundColor,
+      width: MediaQuery.of(context).size.width,
+      height: 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavBarItem(context, Icons.home, "Home"),
-          _buildNavBarItem(context, Icons.people, "Friends"),
-          _buildCenterButton(context), // Special button in the middle
-          _buildNavBarItem(context, Icons.search, "Search"),
-          _buildNavBarItem(context, Icons.person, "Profile"),
+          _buildNavBarItem(
+            context,
+            Icons.home,
+            "Home",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeCasuals()),
+              );
+            },
+          ),
+          _buildNavBarItem(
+            context,
+            Icons.people,
+            "Friends",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Friends()),
+              );
+            },
+          ),
+          _buildCenterButton(context),
+          _buildNavBarItem(
+            context,
+            Icons.search,
+            "Search",
+            () {
+              // Perform the desired action for the Search button
+            },
+          ),
+          _buildNavBarItem(
+            context,
+            Icons.person,
+            "Profile",
+            () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon,
-            color: const Color(
-                0xFF8A56AC)), // Replace with your icon assets and colors
-        Text(label,
-            style: const TextStyle(
-                color: Color(0xFF8A56AC))), // Adjust the styling as needed
-      ],
+  Widget _buildNavBarItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onPressed,
+  ) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.purple),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.purple),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCenterButton(BuildContext context) {
     return Container(
-      width: 68, // Diameter of the circle
-      height: 68, // Diameter of the circle
+      width: 57,
+      height: 57,
       decoration: const BoxDecoration(
-        color:
-            Color(0xFF8A56AC), // Replace with the exact purple color you need
+        color: Colors.purple,
         shape: BoxShape.circle,
       ),
-      child: const Icon(Icons.add,
-          color: Colors.white), // Replace with your custom cross icon
+      child: IconButton(
+        icon: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          // Navigate to the Post screen when the + button is pressed
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Post()),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildRemoveFriendButton() {
+  Widget _buildRemoveFriendButton(BuildContext context) {
     return TextButton(
       onPressed: () {
-        // Implement the removal logic
+        _removeFriend(context); // Implement the removal logic
       },
       child: const Text(
         'Remove Friend',

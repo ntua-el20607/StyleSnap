@@ -268,6 +268,8 @@ class Signup extends StatelessWidget {
           'email': _emailController.text.trim(),
           'phoneNumber': _phoneNumberController.text.trim(),
           'username': _usernameController.text.trim(),
+          // Initialize friends list as an empty array
+          'friends': [],
           // Add other fields as needed
           // 'uid': userId, // Uncomment if you want to store the user's UID as well
         });

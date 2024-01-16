@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:stylesnap/screens/Profile.dart';
+import 'package:stylesnap/screens/friendprofile.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/post.dart';
 import 'package:stylesnap/screens/addfriend.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Nearme extends StatefulWidget {
   const Nearme({super.key});
@@ -61,6 +63,11 @@ class _NearmeState extends State<Nearme> {
         ),
       ),
     );
+  }
+
+  String getCurrentUserId() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user != null ? user.uid : '';
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -233,15 +240,60 @@ class _NearmeState extends State<Nearme> {
   }
 
   Future<void> onSearch(String username) async {
-    bool userExists = await searchUser(username);
-    if (userExists) {
-// Navigate to the AddFriend screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => addfriend(username: username)),
-      );
+    var userQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .limit(1)
+        .get();
+
+    if (userQuery.docs.isNotEmpty) {
+      var userDoc = userQuery.docs.first;
+      var searchedUserId = userDoc.id;
+      var userData = userDoc.data();
+
+      String fullName = userData['fullName'] ?? 'N/A';
+      String email = userData['email'] ?? 'N/A';
+      String phoneNumber = userData['phoneNumber'] ?? 'N/A';
+
+      // Check if the searched user is in the current user's friends list
+      String currentUserId = getCurrentUserId();
+      var currentUserDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUserId)
+          .get();
+
+      List<dynamic> friends = currentUserDoc.data()?['friends'] ?? [];
+
+      if (friends.contains(searchedUserId)) {
+        // Navigate to the FriendProfile screen with user details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => friendprof(
+              userId: searchedUserId,
+              fullName: fullName,
+              email: email,
+              phoneNumber: phoneNumber,
+              username: username,
+            ),
+          ),
+        );
+      } else {
+        // If the user is not a friend, navigate to the AddFriend screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => addfriend(
+                    userId: searchedUserId,
+                    fullName: fullName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    username: username,
+                  )),
+        );
+      }
     } else {
-// Show an error or a message saying user not found
+      // Show an error or a message saying user not found
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('User not found'),
