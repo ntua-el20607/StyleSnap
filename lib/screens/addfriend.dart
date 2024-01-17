@@ -142,7 +142,8 @@ class addfriend extends StatelessWidget {
                 width: 142,
                 height: 142.29,
                 decoration: ShapeDecoration(
-                  shape: const CircleBorder(), // Circle shape for the profile picture
+                  shape:
+                      const CircleBorder(), // Circle shape for the profile picture
                   image: DecorationImage(
                     image: NetworkImage(profilePictureUrl),
                     fit: BoxFit.cover, // Ensures the image covers the container

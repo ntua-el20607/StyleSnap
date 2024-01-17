@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/addfriend.dart';
+import 'package:stylesnap/screens/friendprofile.dart';
 
 class Comments extends StatefulWidget {
   final String postId;
@@ -58,20 +60,13 @@ class _CommentsState extends State<Comments> {
     var currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
-    // Fetch the user's profile picture URL and username
-    var userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser.uid)
-        .get();
-    String profilePictureUrl =
-        userDoc.data()?['profilePictureUrl'] ?? 'default_profile_picture_url';
-    String username = userDoc.data()?['username'] ?? 'Anonymous';
-
     Map<String, dynamic> commentData = {
-      'username': username,
+      'userId': currentUser.uid,
+      'username': currentUser.displayName ?? 'Anonymous',
       'commentText': commentText,
-      'profilePictureUrl': profilePictureUrl,
-      'timestamp': FieldValue.serverTimestamp(), // Add server timestamp
+      'profilePictureUrl':
+          currentUser.photoURL ?? 'default_profile_picture_url',
+      'timestamp': FieldValue.serverTimestamp(),
     };
 
     await FirebaseFirestore.instance
@@ -95,9 +90,13 @@ class _CommentsState extends State<Comments> {
               itemBuilder: (context, index) {
                 var comment = comments[index];
                 return _buildCommentSection(
-                  comment['username'],
-                  comment['commentText'],
-                  comment['profilePictureUrl'],
+                  comment['username'] ??
+                      'Unknown', // Default to 'Unknown' if null
+                  comment['commentText'] ??
+                      '', // Default to empty string if null
+                  comment['profilePictureUrl'] ??
+                      'default_image_url', // Default image URL if null
+                  comment['userId'] ?? '', // Default to empty string if null
                 );
               },
             ),
@@ -146,15 +145,56 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildCommentSection(
-      String name, String comment, String profilePictureUrl) {
+      String name, String comment, String profilePictureUrl, String userId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(profilePictureUrl),
-            radius: 35,
+          GestureDetector(
+            onTap: () async {
+              print("Fetching details for userId: $userId"); // Check the userId
+              var userDetails = await getUserDetails(userId);
+              print(
+                  "User details fetched: $userDetails"); // Check the fetched details
+
+              if (userDetails.isNotEmpty) {
+                bool friendStatus = await isFriend(userId);
+                if (friendStatus) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => friendprof(
+                        userId: userId,
+                        fullName: userDetails['fullName'],
+                        email: userDetails['email'],
+                        phoneNumber: userDetails['phoneNumber'],
+                        username: userDetails['username'],
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => addfriend(
+                        userId: userId,
+                        fullName: userDetails['fullName'],
+                        email: userDetails['email'],
+                        phoneNumber: userDetails['phoneNumber'],
+                        username: userDetails['username'],
+                      ),
+                    ),
+                  );
+                }
+              } else {
+                print("No user details found for userId: $userId");
+              }
+            },
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(profilePictureUrl),
+              radius: 35,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -172,6 +212,77 @@ class _CommentsState extends State<Comments> {
         ],
       ),
     );
+  }
+
+  Future<Map<String, dynamic>> getUserDetails(String userId) async {
+    // Check if userId is not empty
+    if (userId.isEmpty) {
+      print('Error: UserId is empty');
+      return {};
+    }
+
+    try {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (userDoc.exists) {
+        return {
+          'fullName': userDoc.data()?['fullName'] ?? '',
+          'email': userDoc.data()?['email'] ?? '',
+          'phoneNumber': userDoc.data()?['phoneNumber'] ?? '',
+          'username': userDoc.data()?['username'] ?? '',
+        };
+      } else {
+        print('User document does not exist');
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching user details: $e');
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchUserDetails(String userId) async {
+    try {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (userDoc.exists) {
+        return userDoc.data();
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching user details: $e");
+      return null;
+    }
+  }
+
+  Future<bool> isFriend(String userId) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return false;
+
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+
+    List<dynamic> friends = userDoc.data()?['friends'] ?? [];
+    return friends.contains(userId);
+  }
+
+  Future<String?> getUserIdByUsername(String username) async {
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.id; // Return the userId
+    }
+    return null;
   }
 
   Widget _buildCommentInputField() {
