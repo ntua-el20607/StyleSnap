@@ -64,6 +64,17 @@ class _PostState extends State<Post> {
   Future<void> _takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
       if (_isCasualButtonPressed || _isFormalButtonPressed) {
+        String photoType = _isCasualButtonPressed ? 'Casual' : 'Formal';
+        bool alreadyPosted = await hasAlreadyPosted(photoType);
+        if (alreadyPosted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('You have already posted a $photoType photo today.')),
+          );
+          return;
+        }
+
         final XFile photo = await _controller!.takePicture();
 
         // Capture current location
@@ -73,8 +84,7 @@ class _PostState extends State<Post> {
           var photoUrl = await _savePhotoToStorage(photo.path);
 
           // Save the photo URL and location to Firestore
-          await savePhotoInfoToFirestore(photoUrl,
-              _isCasualButtonPressed ? 'Casual' : 'Formal', currentLocation);
+          await savePhotoInfoToFirestore(photoUrl, photoType, currentLocation);
 
           // Navigate based on the button press
           if (_isCasualButtonPressed) {
@@ -82,7 +92,7 @@ class _PostState extends State<Post> {
               context,
               MaterialPageRoute(builder: (context) => const HomeCasuals()),
             );
-          } else if (_isFormalButtonPressed) {
+          } else {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeFormals()),
@@ -106,6 +116,26 @@ class _PostState extends State<Post> {
         );
       }
     }
+  }
+
+  Future<bool> hasAlreadyPosted(String photoType) async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return false;
+    }
+    var today = DateTime.now();
+    var startOfToday = DateTime(today.year, today.month, today.day);
+    var endOfToday = DateTime(today.year, today.month, today.day + 1);
+
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection('posts')
+        .where('userId', isEqualTo: user.uid)
+        .where('photoType', isEqualTo: photoType)
+        .where('timestamp', isGreaterThanOrEqualTo: startOfToday)
+        .where('timestamp', isLessThan: endOfToday)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
   }
 
   Future<String> _savePhotoToStorage(String photoPath) async {

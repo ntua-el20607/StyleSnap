@@ -62,7 +62,7 @@ class _HomeFormalsState extends State<HomeFormals> {
         .collection('posts')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => doc['photo'].toString()).toList();
+      return snapshot.docs.map((doc) => doc['photos'].toString()).toList();
     });
   }
 
@@ -95,10 +95,10 @@ class _HomeFormalsState extends State<HomeFormals> {
           itemCount: postInfoList.length,
           itemBuilder: (context, index) {
             Map<String, dynamic> postInfo = postInfoList[index];
-            String imageURL = postInfo['photoUrl'];
+            String imageUrl = postInfo['imageUrl'];
             return Column(
               children: [
-                Image.network(imageURL, fit: BoxFit.cover),
+                Image.network(imageUrl, fit: BoxFit.cover),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
@@ -122,16 +122,39 @@ class _HomeFormalsState extends State<HomeFormals> {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getPostInfo() {
-    return FirebaseFirestore.instance
+  Stream<List<Map<String, dynamic>>> getPostInfo() async* {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      yield [];
+      return;
+    }
+
+    // Fetch the current user's friends list
+    var userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('photos')
-        .where('photoType', isEqualTo: 'Formal') // Updated type
+        .doc(currentUser.uid)
+        .get();
+    List<dynamic> friends = userDoc.data()?['friends'] ?? [];
+    friends.add(currentUser.uid); // Include current user's ID
+
+    // Check if the friends list is empty
+    if (friends.isEmpty) {
+      yield [];
+      return;
+    }
+
+    // Fetch posts of type 'Formal'
+    yield* FirebaseFirestore.instance
+        .collection('posts')
+        .where('photoType', isEqualTo: 'Formal') // Fetching Formal posts
+        .where('userId', whereIn: friends)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => {'photoUrl': doc['photoUrl'].toString()})
+          .map((doc) => {
+                'imageUrl': doc.data()['imageUrl'].toString(),
+                // Include other fields as needed
+              })
           .toList();
     });
   }
