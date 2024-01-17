@@ -67,51 +67,35 @@ class _HomeCasualsState extends State<HomeCasuals> {
   }
 
   Widget _buildPostsList() {
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<QuerySnapshot>(
       stream: getPostInfo(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Text('giasas egw ime exi error: ${snapshot.error}');
+          return Text('Error: ${snapshot.error}');
         }
-
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
-
-        final List<Map<String, dynamic>>? postInfoList = snapshot.data;
-
-        if (postInfoList == null || postInfoList.isEmpty) {
-          return const Center(
-            child: Text('No posts yet'),
-          );
+        if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No posts yet'));
         }
 
         return ListView.builder(
-          itemCount: postInfoList.length,
+          itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
-            Map<String, dynamic> postInfo = postInfoList[index];
-            print("Post Info: $postInfo"); // This will log the entire map
+            DocumentSnapshot doc = snapshot.data!.docs[index];
+            String postId = doc.id; // Firestore document ID as postId
+            Map<String, dynamic> postInfo = doc.data() as Map<String, dynamic>;
+            String? imageUrl = postInfo['imageUrl'];
 
-            String? imageUrl = postInfo['imageUrl'] as String?;
-            if (imageUrl == null) {
-              print("Image URL is null for post index $index");
-              imageUrl = 'default_image_url_here'; // handle null URL
-            }
             return Column(
               children: [
                 Image.network(
-                  imageUrl,
+                  imageUrl ?? 'default_image_url_here',
                   fit: BoxFit.cover,
                   errorBuilder: (BuildContext context, Object exception,
                       StackTrace? stackTrace) {
-                    print("Image URL: $imageUrl");
-
-                    print('Image load error: $exception'); // Log the error
-                    return Text(
-                        'Failed to load image'); // Placeholder text or widget
+                    return Text('Failed to load image');
                   },
                 ),
                 Padding(
@@ -122,10 +106,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
                       const Spacer(),
                       _buildStarRating(index),
                       const Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: _buildCommentIcon(context),
-                      ),
+                      _buildCommentIcon(context, postId),
                     ],
                   ),
                 ),
@@ -137,48 +118,52 @@ class _HomeCasualsState extends State<HomeCasuals> {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getPostInfo() async* {
+  Widget _buildStarRating(int index) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (starIndex) {
+        return IconButton(
+          icon: Icon(
+            _ratings[index] > starIndex ? Icons.star : Icons.star_border,
+            color: _ratings[index] > starIndex ? Colors.amber : Colors.grey,
+            size: 30.0,
+          ),
+          onPressed: () {
+            setState(() {
+              _ratings[index] = starIndex + 1;
+            });
+          },
+        );
+      }),
+    );
+  }
+
+  Stream<QuerySnapshot> getPostInfo() {
+    return _fetchFriendsList().asStream().asyncExpand((friends) {
+      if (friends.isEmpty) {
+        return Stream.empty();
+      }
+      return FirebaseFirestore.instance
+          .collection('posts')
+          .where('photoType', isEqualTo: 'Casual')
+          .where('userId', whereIn: friends)
+          .snapshots();
+    });
+  }
+
+  Future<List<dynamic>> _fetchFriendsList() async {
     var currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      yield [];
-      return;
+      return [];
     }
 
-    // Fetch the current user's friends list
     var userDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser.uid)
         .get();
     List<dynamic> friends = userDoc.data()?['friends'] ?? [];
-
-    // Add the current user's ID to the list to fetch their posts as well
-    friends.add(currentUser.uid);
-
-    // Check if the friends list is empty
-    if (friends.isEmpty) {
-      yield [];
-      return;
-    }
-
-    // If the friends list is too long for a 'whereIn' query, consider an alternative approach
-    // ...
-
-    // Proceed with the query if the friends list is not empty
-    yield* FirebaseFirestore.instance
-        .collection('posts')
-        .where('photoType', isEqualTo: 'Casual')
-        .where('userId',
-            whereIn:
-                friends) // Filter by friends' userIds and the user's own ID
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => {
-                'imageUrl': doc.data()['imageUrl'].toString(),
-                // Include other post fields you might need
-              })
-          .toList();
-    });
+    friends.add(currentUser.uid); // Include the user's ID
+    return friends;
   }
 
   // Listen to the posts collection
@@ -237,41 +222,21 @@ class _HomeCasualsState extends State<HomeCasuals> {
     );
   }
 
-  Widget _buildStarRating(int index) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (starIndex) {
-        return IconButton(
-          icon: Icon(
-            _ratings[index] > starIndex ? Icons.star : Icons.star_border,
-            color: _ratings[index] > starIndex ? Colors.amber : Colors.grey,
-            size: 30.0,
-          ),
-          onPressed: () {
-            setState(() {
-              _ratings[index] = starIndex + 1;
-            });
-          },
-        );
-      }),
-    );
-  }
-
-  Widget _buildCommentIcon(BuildContext context) {
+  Widget _buildCommentIcon(BuildContext context, String postId) {
     return IconButton(
       icon: const Icon(Icons.mode_comment, color: Colors.grey, size: 30.0),
       onPressed: () {
-        _showCommentsScreen(context);
+        _showCommentsScreen(context, postId);
       },
     );
   }
 
-  void _showCommentsScreen(BuildContext context) {
+  void _showCommentsScreen(BuildContext context, String postId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext bc) {
-        return const Comments();
+        return Comments(postId: postId);
       },
     );
   }

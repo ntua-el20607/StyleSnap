@@ -67,38 +67,37 @@ class _HomeFormalsState extends State<HomeFormals> {
   }
 
   Widget _buildPostsList() {
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<QuerySnapshot>(
       stream: getPostInfo(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          );
+          return Text('Error: ${snapshot.error}');
         }
-
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
-
-        final List<Map<String, dynamic>>? postInfoList = snapshot.data;
-
-        if (postInfoList == null || postInfoList.isEmpty) {
-          return const Center(
-            child: Text('No posts yet'),
-          );
+        if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No posts yet'));
         }
 
         return ListView.builder(
-          itemCount: postInfoList.length,
+          itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
-            Map<String, dynamic> postInfo = postInfoList[index];
-            String imageUrl = postInfo['imageUrl'];
+            DocumentSnapshot doc = snapshot.data!.docs[index];
+            String postId = doc.id; // Firestore document ID as postId
+            Map<String, dynamic> postInfo = doc.data() as Map<String, dynamic>;
+            String? imageUrl = postInfo['imageUrl'];
+
             return Column(
               children: [
-                Image.network(imageUrl, fit: BoxFit.cover),
+                Image.network(
+                  imageUrl ?? 'default_image_url_here',
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace? stackTrace) {
+                    return Text('Failed to load image');
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
@@ -107,10 +106,7 @@ class _HomeFormalsState extends State<HomeFormals> {
                       const Spacer(),
                       _buildStarRating(index),
                       const Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: _buildCommentIcon(context),
-                      ),
+                      _buildCommentIcon(context, postId),
                     ],
                   ),
                 ),
@@ -122,41 +118,32 @@ class _HomeFormalsState extends State<HomeFormals> {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getPostInfo() async* {
+  Stream<QuerySnapshot> getPostInfo() {
+    return _fetchFriendsList().asStream().asyncExpand((friends) {
+      if (friends.isEmpty) {
+        return Stream.empty();
+      }
+      return FirebaseFirestore.instance
+          .collection('posts')
+          .where('photoType', isEqualTo: 'Formal')
+          .where('userId', whereIn: friends)
+          .snapshots();
+    });
+  }
+
+  Future<List<dynamic>> _fetchFriendsList() async {
     var currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      yield [];
-      return;
+      return [];
     }
 
-    // Fetch the current user's friends list
     var userDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser.uid)
         .get();
     List<dynamic> friends = userDoc.data()?['friends'] ?? [];
-    friends.add(currentUser.uid); // Include current user's ID
-
-    // Check if the friends list is empty
-    if (friends.isEmpty) {
-      yield [];
-      return;
-    }
-
-    // Fetch posts of type 'Formal'
-    yield* FirebaseFirestore.instance
-        .collection('posts')
-        .where('photoType', isEqualTo: 'Formal') // Fetching Formal posts
-        .where('userId', whereIn: friends)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => {
-                'imageUrl': doc.data()['imageUrl'].toString(),
-                // Include other fields as needed
-              })
-          .toList();
-    });
+    friends.add(currentUser.uid); // Include the user's ID
+    return friends;
   }
 
   Widget _buildNavBarItem(BuildContext context, IconData icon, String label) {
@@ -233,21 +220,21 @@ class _HomeFormalsState extends State<HomeFormals> {
     );
   }
 
-  Widget _buildCommentIcon(BuildContext context) {
+  Widget _buildCommentIcon(BuildContext context, String postId) {
     return IconButton(
       icon: const Icon(Icons.mode_comment, color: Colors.grey, size: 30.0),
       onPressed: () {
-        _showCommentsScreen(context);
+        _showCommentsScreen(context, postId);
       },
     );
   }
 
-  void _showCommentsScreen(BuildContext context) {
+  void _showCommentsScreen(BuildContext context, String postId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext bc) {
-        return const Comments();
+        return Comments(postId: postId);
       },
     );
   }
