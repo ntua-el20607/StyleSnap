@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/addfriend.dart';
 import 'package:stylesnap/screens/friendprofile.dart';
 
 class Comments extends StatefulWidget {
   final String postId;
 
-  const Comments({Key? key, required this.postId}) : super(key: key);
+  const Comments({super.key, required this.postId});
 
   @override
   _CommentsState createState() => _CommentsState();
@@ -42,14 +43,15 @@ class _CommentsState extends State<Comments> {
     FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.postId)
-        .collection(
-            'comments') // Assuming you have a subcollection for comments
+        .collection('comments')
         .orderBy('timestamp', descending: true)
         .snapshots()
         .listen((data) {
-      setState(() {
-        comments = data.docs.map((doc) => doc.data()).toList();
-      });
+      if (mounted) {
+        setState(() {
+          comments = data.docs.map((doc) => doc.data()).toList();
+        });
+      }
     });
   }
 
@@ -60,12 +62,21 @@ class _CommentsState extends State<Comments> {
     var currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+    if (!userDoc.exists) {
+      print("User document does not exist");
+      return;
+    }
+
     Map<String, dynamic> commentData = {
       'userId': currentUser.uid,
-      'username': currentUser.displayName ?? 'Anonymous',
+      'username': userDoc.data()?['username'] ?? 'Anonymous',
       'commentText': commentText,
       'profilePictureUrl':
-          currentUser.photoURL ?? 'default_profile_picture_url',
+          userDoc.data()?['profilePictureUrl'] ?? 'default_profile_picture_url',
       'timestamp': FieldValue.serverTimestamp(),
     };
 
@@ -146,6 +157,9 @@ class _CommentsState extends State<Comments> {
 
   Widget _buildCommentSection(
       String name, String comment, String profilePictureUrl, String userId) {
+    // Check if the profile picture belongs to the logged-in user
+    bool isCurrentUser = userId == FirebaseAuth.instance.currentUser?.uid;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -153,42 +167,51 @@ class _CommentsState extends State<Comments> {
         children: [
           GestureDetector(
             onTap: () async {
-              print("Fetching details for userId: $userId"); // Check the userId
-              var userDetails = await getUserDetails(userId);
-              print(
-                  "User details fetched: $userDetails"); // Check the fetched details
-
-              if (userDetails.isNotEmpty) {
-                bool friendStatus = await isFriend(userId);
-                if (friendStatus) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => friendprof(
-                        userId: userId,
-                        fullName: userDetails['fullName'],
-                        email: userDetails['email'],
-                        phoneNumber: userDetails['phoneNumber'],
-                        username: userDetails['username'],
-                      ),
-                    ),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => addfriend(
-                        userId: userId,
-                        fullName: userDetails['fullName'],
-                        email: userDetails['email'],
-                        phoneNumber: userDetails['phoneNumber'],
-                        username: userDetails['username'],
-                      ),
-                    ),
-                  );
-                }
+              if (isCurrentUser) {
+                // Navigate to the logged-in user's profile screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
               } else {
-                print("No user details found for userId: $userId");
+                print("Fetching details for userId: $userId");
+                var userDetails = await getUserDetails(userId);
+                print("User details fetched: $userDetails");
+
+                if (userDetails.isNotEmpty) {
+                  bool friendStatus = await isFriend(userId);
+                  if (friendStatus) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => friendprof(
+                          userId: userId,
+                          fullName: userDetails['fullName'],
+                          email: userDetails['email'],
+                          phoneNumber: userDetails['phoneNumber'],
+                          username: userDetails['username'],
+                        ),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => addfriend(
+                          userId: userId,
+                          fullName: userDetails['fullName'],
+                          email: userDetails['email'],
+                          phoneNumber: userDetails['phoneNumber'],
+                          username: userDetails['username'],
+                        ),
+                      ),
+                    );
+                  }
+                } else {
+                  print("No user details found for userId: $userId");
+                }
               }
             },
             child: CircleAvatar(
@@ -287,7 +310,7 @@ class _CommentsState extends State<Comments> {
 
   Widget _buildCommentInputField() {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           CircleAvatar(
@@ -295,11 +318,11 @@ class _CommentsState extends State<Comments> {
                 currentUserProfilePictureUrl), // Update with user's profile picture
             radius: 35,
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: TextField(
               controller: _commentController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Add a comment...",
                 border: OutlineInputBorder(),
               ),
@@ -307,7 +330,7 @@ class _CommentsState extends State<Comments> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send),
+            icon: const Icon(Icons.send),
             onPressed: _postComment,
           ),
         ],

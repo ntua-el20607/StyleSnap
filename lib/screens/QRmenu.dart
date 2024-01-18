@@ -21,8 +21,8 @@ class QRMenuScreen extends StatelessWidget {
             return const Center(child: Text('No user data available'));
           } else {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
-            final String qrData = userData['uid'] ??
-                'Default Data'; // Replace 'uid' with the appropriate field
+            final String qrData =
+                snapshot.data!.id; // Use document ID as QR data
 
             return Container(
               padding: const EdgeInsets.all(20),
@@ -98,6 +98,25 @@ class QRMenuScreen extends StatelessWidget {
     if (auth.currentUser != null) {
       String userId = auth.currentUser!.uid;
       return FirebaseFirestore.instance.collection('users').doc(userId).get();
+    } else {
+      throw Exception('User not signed in');
+    }
+  }
+
+  Future<String> getCurrentUserDocumentId() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    if (auth.currentUser != null) {
+      String userId = auth.currentUser!.uid;
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+      DocumentSnapshot userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        return userSnapshot.id; // Return the document ID
+      } else {
+        throw Exception('User document does not exist');
+      }
     } else {
       throw Exception('User not signed in');
     }

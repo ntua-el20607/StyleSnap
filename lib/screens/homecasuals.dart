@@ -16,7 +16,14 @@ class HomeCasuals extends StatefulWidget {
 }
 
 class _HomeCasualsState extends State<HomeCasuals> {
+  Map<String, int> postRatings = {};
   final List<int> _ratings = List.generate(100, (index) => 0);
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialRatings(); // Call the method here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +102,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
                   fit: BoxFit.cover,
                   errorBuilder: (BuildContext context, Object exception,
                       StackTrace? stackTrace) {
-                    return Text('Failed to load image');
+                    return const Text('Failed to load image');
                   },
                 ),
                 Padding(
@@ -104,7 +111,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Spacer(),
-                      _buildStarRating(index),
+                      _buildStarRating(postId),
                       const Spacer(),
                       _buildCommentIcon(context, postId),
                     ],
@@ -118,30 +125,10 @@ class _HomeCasualsState extends State<HomeCasuals> {
     );
   }
 
-  Widget _buildStarRating(int index) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (starIndex) {
-        return IconButton(
-          icon: Icon(
-            _ratings[index] > starIndex ? Icons.star : Icons.star_border,
-            color: _ratings[index] > starIndex ? Colors.amber : Colors.grey,
-            size: 30.0,
-          ),
-          onPressed: () {
-            setState(() {
-              _ratings[index] = starIndex + 1;
-            });
-          },
-        );
-      }),
-    );
-  }
-
   Stream<QuerySnapshot> getPostInfo() {
     return _fetchFriendsList().asStream().asyncExpand((friends) {
       if (friends.isEmpty) {
-        return Stream.empty();
+        return const Stream.empty();
       }
       return FirebaseFirestore.instance
           .collection('posts')
@@ -261,6 +248,101 @@ class _HomeCasualsState extends State<HomeCasuals> {
         },
       ),
     );
+  }
+
+  Widget _buildStarRating(String postId) {
+    int userRating = postRatings[postId] ?? 0;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        return IconButton(
+          icon: Icon(
+            userRating > index ? Icons.star : Icons.star_border,
+            color: userRating > index ? Colors.amber : Colors.grey,
+          ),
+          onPressed: () async {
+            await updateUserRatingForPost(postId, index + 1);
+            setState(() {
+              postRatings[postId] = index + 1;
+            });
+          },
+        );
+      }),
+    );
+  }
+
+  Future<int> getUserRatingForPost(String postId) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return 0;
+
+    try {
+      var ratingDoc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('ratings')
+          .doc(currentUser.uid)
+          .get();
+
+      if (ratingDoc.exists) {
+        var data = ratingDoc.data();
+        return data?['rating'] ?? 0;
+      } else {
+        return 0;
+      }
+    } catch (e) {
+      print('Error fetching user rating: $e');
+      return 0;
+    }
+  }
+
+  Future<void> updateUserRatingForPost(String postId, int rating) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    var ratingRef = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('ratings')
+        .doc(currentUser.uid);
+
+    // Check if the rating document exists
+    var doc = await ratingRef.get();
+    if (!doc.exists) {
+      // Create the document with the initial rating
+      await ratingRef.set({
+        'rating': rating,
+      });
+    } else {
+      // Update the existing rating
+      await ratingRef.update({
+        'rating': rating,
+      });
+    }
+  }
+
+  void fetchInitialRatings() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    var snapshot = await FirebaseFirestore.instance.collection('posts').get();
+
+    var initialRatings = <String, int>{};
+    for (var doc in snapshot.docs) {
+      var ratingDoc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(doc.id)
+          .collection('ratings')
+          .doc(currentUser.uid)
+          .get();
+
+      initialRatings[doc.id] = ratingDoc.data()?['rating'] ?? 0;
+    }
+
+    if (mounted) {
+      setState(() {
+        postRatings = initialRatings;
+      });
+    }
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {

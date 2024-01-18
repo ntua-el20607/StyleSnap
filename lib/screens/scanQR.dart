@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:stylesnap/screens/QRmenu.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ScanQRScreen extends StatelessWidget {
   const ScanQRScreen({super.key});
@@ -23,7 +25,7 @@ class ScanQRScreen extends StatelessWidget {
             const SizedBox(height: 60),
             SizedBox(
               height: screenHeight * 0.5, // Adjust the height as needed
-              child: _buildQRScanner(screenWidth, screenHeight),
+              child: _buildQRScanner(context, screenWidth, screenHeight),
             ),
             const Spacer(),
             // Wrap the QR scanner in Expanded
@@ -91,11 +93,14 @@ class ScanQRScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQRScanner(double width, double height) {
+  Widget _buildQRScanner(BuildContext context, double width, double height) {
     return Expanded(
       child: QRView(
         key: GlobalKey(debugLabel: 'QR'),
-        onQRViewCreated: _onQRViewCreated,
+        onQRViewCreated: (controller) {
+          _onQRViewCreated(
+              controller, context); // Pass both controller and context
+        },
         overlay: QrScannerOverlayShape(
           borderColor: Colors.red,
           borderRadius: 10,
@@ -107,8 +112,84 @@ class ScanQRScreen extends StatelessWidget {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    // Add your logic for when the QR code is scanned
+  void _onQRViewCreated(QRViewController controller, BuildContext context) {
+    controller.scannedDataStream.listen((scanData) async {
+      // Extract the UserID from the scanned QR code data
+      String scannedUserId = scanData.code ?? '';
+
+      // Check if the scanned UserID exists in your Firestore database
+      bool userExists = await checkIfUserExists(scannedUserId);
+
+      if (userExists) {
+        // Add the scanned user to your friend list
+        bool addedToFriends = await addToFriendList(scannedUserId);
+
+        if (addedToFriends) {
+          // Display a success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User added to your friend list.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          // Display an error message if adding to friends fails
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to add user to friend list.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // Display a message if the scanned UserID doesn't exist
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User not found.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+  }
+
+  Future<bool> checkIfUserExists(String userId) async {
+    try {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      return userDoc.exists;
+    } catch (e) {
+      print('Error checking if user exists: $e');
+      return false;
+    }
+  }
+
+  Future<bool> addToFriendList(String userId) async {
+    try {
+      var currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return false;
+
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      List<dynamic> friends = userDoc.data()?['friends'] ?? [];
+      if (!friends.contains(userId)) {
+        friends.add(userId);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'friends': friends});
+      }
+
+      return true;
+    } catch (e) {
+      print('Error adding user to friend list: $e');
+      return false;
+    }
   }
 
   Widget _buildBackButton(BuildContext context) {
