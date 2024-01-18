@@ -255,42 +255,54 @@ class _NearmeState extends State<Nearme> {
       String email = userData['email'] ?? 'N/A';
       String phoneNumber = userData['phoneNumber'] ?? 'N/A';
 
-      // Check if the searched user is in the current user's friends list
+      // Check if the searched user is the current user
       String currentUserId = getCurrentUserId();
-      var currentUserDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUserId)
-          .get();
-
-      List<dynamic> friends = currentUserDoc.data()?['friends'] ?? [];
-
-      if (friends.contains(searchedUserId)) {
-        // Navigate to the FriendProfile screen with user details
+      if (searchedUserId == currentUserId) {
+        // Navigate to the user's own profile
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => friendprof(
-              userId: searchedUserId,
-              fullName: fullName,
-              email: email,
-              phoneNumber: phoneNumber,
-              username: username,
-            ),
+            builder: (context) => const ProfileScreen(),
           ),
         );
       } else {
-        // If the user is not a friend, navigate to the AddFriend screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
+        // Check if the searched user is in the current user's friends list
+        var currentUserDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUserId)
+            .get();
+
+        List<dynamic> friends = currentUserDoc.data()?['friends'] ?? [];
+
+        if (friends.contains(searchedUserId)) {
+          // Navigate to the FriendProfile screen with user details
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => friendprof(
+                userId: searchedUserId,
+                fullName: fullName,
+                email: email,
+                phoneNumber: phoneNumber,
+                username: username,
+              ),
+            ),
+          );
+        } else {
+          // If the user is not a friend, navigate to the AddFriend screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
               builder: (context) => addfriend(
-                    userId: searchedUserId,
-                    fullName: fullName,
-                    email: email,
-                    phoneNumber: phoneNumber,
-                    username: username,
-                  )),
-        );
+                userId: searchedUserId,
+                fullName: fullName,
+                email: email,
+                phoneNumber: phoneNumber,
+                username: username,
+              ),
+            ),
+          );
+        }
       }
     } else {
       // Show an error or a message saying user not found
