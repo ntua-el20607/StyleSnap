@@ -102,7 +102,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
                   fit: BoxFit.cover,
                   errorBuilder: (BuildContext context, Object exception,
                       StackTrace? stackTrace) {
-                    return Text('Failed to load image');
+                    return const Text('Failed to load image');
                   },
                 ),
                 Padding(
@@ -128,7 +128,7 @@ class _HomeCasualsState extends State<HomeCasuals> {
   Stream<QuerySnapshot> getPostInfo() {
     return _fetchFriendsList().asStream().asyncExpand((friends) {
       if (friends.isEmpty) {
-        return Stream.empty();
+        return const Stream.empty();
       }
       return FirebaseFirestore.instance
           .collection('posts')
