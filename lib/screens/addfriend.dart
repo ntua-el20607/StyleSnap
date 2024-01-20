@@ -5,6 +5,7 @@ import 'package:stylesnap/screens/Post.dart';
 import 'package:stylesnap/screens/Profile.dart';
 import 'package:stylesnap/screens/friends.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
+import 'package:stylesnap/screens/nearme.dart';
 
 class addfriend extends StatelessWidget {
   final String userId;
@@ -230,7 +231,10 @@ class addfriend extends StatelessWidget {
             Icons.search,
             "Search",
             () {
-              // Perform the desired action for the Search button
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Nearme()),
+              );
             },
           ),
           _buildNavBarItem(
