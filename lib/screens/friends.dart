@@ -347,7 +347,7 @@ class Friends extends StatelessWidget {
                                                           ],
                                                         ),
                                                         const SizedBox(
-                                                            width: 150),
+                                                            width: 100),
                                                         Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -503,7 +503,7 @@ class Friends extends StatelessWidget {
                                                           ],
                                                         ),
                                                         const SizedBox(
-                                                            width: 150),
+                                                            width: 100),
                                                         Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -657,7 +657,7 @@ class Friends extends StatelessWidget {
                                                           ],
                                                         ),
                                                         const SizedBox(
-                                                            width: 95),
+                                                            width: 45),
                                                         Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
