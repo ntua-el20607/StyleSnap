@@ -268,6 +268,7 @@ class Signup extends StatelessWidget {
           'email': _emailController.text.trim(),
           'phoneNumber': _phoneNumberController.text.trim(),
           'username': _usernameController.text.trim(),
+          'password': _passwordController.text.trim(),
           // Initialize friends list as an empty array
           'friends': [],
           // Add other fields as needed

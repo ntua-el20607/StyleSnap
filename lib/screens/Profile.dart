@@ -18,6 +18,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _profilePictureUrl;
   String? _username;
+  int? _totalPosts;
 
   @override
   void initState() {
@@ -35,12 +36,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final username = userDoc['username'];
 
+      // Fetch the posts of the current user based on userId
+      final QuerySnapshot postsSnapshot = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      // Print the number of posts for debugging
+      print('Number of posts for $username: ${postsSnapshot.docs.length}');
+
+      // Update the total posts count
+      final int totalPosts = postsSnapshot.docs.length;
+
       setState(() {
-        _profilePictureUrl = userDoc['profilePictureUrl'];
         _username = username;
       });
+      setState(() {
+        _totalPosts = totalPosts;
+      });
+      setState(() {
+        _profilePictureUrl = userDoc['profilePictureUrl'];
+      });
     } catch (e) {
-      print('Error loading profile data: $e'); // Add this line for debugging
+      print('Error loading profile data: $e');
     }
   }
 
@@ -186,9 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTotalOutfitsCount() {
-    return const Center(
+    return Center(
       child: Text(
-        '70',
+        _totalPosts != null ? _totalPosts.toString() : '0',
         style: TextStyle(
           color: Colors.purple,
           fontSize: 30,

@@ -33,11 +33,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           .get();
 
       setState(() {
-        _profilePictureUrl = userDoc['profilePictureUrl'];
-        _usernameController.text = userDoc['username'] ?? '';
-        _emailController.text = userDoc['email'] ?? '';
-        _phoneController.text = userDoc['phoneNumber'] ?? '';
-        _passwordController.text = userDoc['password'] ?? '';
+        _usernameController.text =
+            userDoc.exists ? userDoc['username'] ?? '' : '';
+        _emailController.text = userDoc.exists ? userDoc['email'] ?? '' : '';
+        _phoneController.text =
+            userDoc.exists ? userDoc['phoneNumber'] ?? '' : '';
+        _passwordController.text =
+            userDoc.exists ? userDoc['password'] ?? '' : '';
+        _profilePictureUrl =
+            userDoc.exists ? userDoc['profilePictureUrl'] : null;
       });
     } catch (e) {
       print('Error loading profile data: $e');

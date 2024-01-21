@@ -206,6 +206,7 @@ class Friends extends StatelessWidget {
     User? currentUser = FirebaseAuth.instance.currentUser;
     String currentUserId = currentUser?.uid ?? '';
     CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference posts = FirebaseFirestore.instance.collection('posts');
 
     return FutureBuilder<DocumentSnapshot>(
       future: users.doc(currentUserId).get(),
@@ -250,6 +251,509 @@ class Friends extends StatelessWidget {
                           )
                         : Container(),
                     friendsList.isNotEmpty
+                        ? Column(
+                            children: [
+                              buildTopFriendsText(context),
+                              FutureBuilder<Map<String, int>>(
+                                future: fetchFriendPostStatistics(
+                                  currentUserId,
+                                  friendsList,
+                                  posts,
+                                  photoType:
+                                      'Casual', // Specify the photoType as 'Casual'
+                                ),
+                                builder: (context, postStatsSnapshot) {
+                                  if (postStatsSnapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    if (postStatsSnapshot.hasError) {
+                                      return Container(
+                                        child: Text(
+                                            'Error: ${postStatsSnapshot.error}'),
+                                      );
+                                    }
+
+                                    Map<String, int>? postStatistics =
+                                        postStatsSnapshot.data;
+
+                                    if (postStatistics != null) {
+                                      // Find friend with the most casual posts
+                                      String friendWithMostCasualPosts = '';
+                                      int maxCasualPostCount = 0;
+
+                                      postStatistics.forEach((friendId, count) {
+                                        if (count > maxCasualPostCount) {
+                                          maxCasualPostCount = count;
+                                          friendWithMostCasualPosts = friendId;
+                                        }
+                                      });
+
+                                      if (maxCasualPostCount > 0) {
+                                        // Display information about the friend with the most casual posts
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            FutureBuilder<DocumentSnapshot>(
+                                              future: users
+                                                  .doc(
+                                                      friendWithMostCasualPosts)
+                                                  .get(),
+                                              builder:
+                                                  (context, friendSnapshot) {
+                                                if (friendSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.done) {
+                                                  if (friendSnapshot.hasError) {
+                                                    return Container(
+                                                      child: Text(
+                                                          'Error: ${friendSnapshot.error}'),
+                                                    );
+                                                  }
+
+                                                  if (friendSnapshot.hasData) {
+                                                    Map<String, dynamic>
+                                                        friendData =
+                                                        friendSnapshot.data!
+                                                                .data()
+                                                            as Map<String,
+                                                                dynamic>;
+
+                                                    String profilePictureUrl =
+                                                        friendData.containsKey(
+                                                                'profilePictureUrl')
+                                                            ? friendData[
+                                                                    'profilePictureUrl'] ??
+                                                                ''
+                                                            : '';
+                                                    int casualPostCount =
+                                                        postStatistics[
+                                                                friendWithMostCasualPosts] ??
+                                                            0;
+
+                                                    return Row(
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Most Casual Posts: $casualPostCount',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 150),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            CircleAvatar(
+                                                              radius: 40,
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                      profilePictureUrl),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 3),
+                                                            Text(
+                                                              friendData[
+                                                                  'username'],
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                }
+
+                                                return Container();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        // Display a message when none of the friends have casual posts
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            Text(
+                                              'No Casual post stats yet.',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    }
+                                  }
+
+                                  return Container(); // Handle loading state or empty state
+                                },
+                              ),
+                            ],
+                          )
+                        : Container(),
+                    friendsList.isNotEmpty
+                        ? Column(
+                            children: [
+                              FutureBuilder<Map<String, int>>(
+                                future: fetchFriendPostStatistics(
+                                  currentUserId,
+                                  friendsList,
+                                  posts,
+                                  photoType:
+                                      'Formal', // Specify the photoType as 'Formal'
+                                ),
+                                builder: (context, postStatsSnapshot) {
+                                  if (postStatsSnapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    if (postStatsSnapshot.hasError) {
+                                      return Container(
+                                        child: Text(
+                                            'Error: ${postStatsSnapshot.error}'),
+                                      );
+                                    }
+
+                                    Map<String, int>? postStatistics =
+                                        postStatsSnapshot.data;
+
+                                    if (postStatistics != null) {
+                                      // Find friend with the most formal posts
+                                      String friendWithMostFormalPosts = '';
+                                      int maxFormalPostCount = 0;
+
+                                      postStatistics.forEach((friendId, count) {
+                                        if (count > maxFormalPostCount) {
+                                          maxFormalPostCount = count;
+                                          friendWithMostFormalPosts = friendId;
+                                        }
+                                      });
+
+                                      if (maxFormalPostCount > 0) {
+                                        // Display information about the friend with the most formal posts
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            FutureBuilder<DocumentSnapshot>(
+                                              future: users
+                                                  .doc(
+                                                      friendWithMostFormalPosts)
+                                                  .get(),
+                                              builder:
+                                                  (context, friendSnapshot) {
+                                                if (friendSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.done) {
+                                                  if (friendSnapshot.hasError) {
+                                                    return Container(
+                                                      child: Text(
+                                                          'Error: ${friendSnapshot.error}'),
+                                                    );
+                                                  }
+
+                                                  if (friendSnapshot.hasData) {
+                                                    Map<String, dynamic>
+                                                        friendData =
+                                                        friendSnapshot.data!
+                                                                .data()
+                                                            as Map<String,
+                                                                dynamic>;
+
+                                                    String profilePictureUrl =
+                                                        friendData.containsKey(
+                                                                'profilePictureUrl')
+                                                            ? friendData[
+                                                                    'profilePictureUrl'] ??
+                                                                ''
+                                                            : '';
+                                                    int formalPostCount =
+                                                        postStatistics[
+                                                                friendWithMostFormalPosts] ??
+                                                            0;
+
+                                                    return Row(
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Most Formal Posts: $formalPostCount',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 150),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            CircleAvatar(
+                                                              radius: 40,
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                      profilePictureUrl),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 3),
+                                                            Text(
+                                                              friendData[
+                                                                  'username'],
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                }
+
+                                                return Container();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        // Display a message when none of the friends have formal posts
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            Text(
+                                              'No formal post stats yet.',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    }
+                                  }
+
+                                  return Container(); // Handle loading state or empty state
+                                },
+                              ),
+                            ],
+                          )
+                        : Container(),
+                    friendsList.isNotEmpty
+                        ? Column(
+                            children: [
+                              FutureBuilder<Map<String, int>>(
+                                future: fetchFriendRatingStatistics(
+                                  currentUserId,
+                                  friendsList,
+                                  posts,
+                                ),
+                                builder: (context, ratingStatsSnapshot) {
+                                  if (ratingStatsSnapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    if (ratingStatsSnapshot.hasError) {
+                                      return Container(
+                                        child: Text(
+                                            'Error: ${ratingStatsSnapshot.error}'),
+                                      );
+                                    }
+
+                                    Map<String, int>? ratingStatistics =
+                                        ratingStatsSnapshot.data;
+
+                                    if (ratingStatistics != null) {
+                                      // Find friend with the most ratings
+                                      String friendWithMostRatings = '';
+                                      int maxRatingCount = 0;
+
+                                      ratingStatistics
+                                          .forEach((friendId, count) {
+                                        if (count > maxRatingCount) {
+                                          maxRatingCount = count;
+                                          friendWithMostRatings = friendId;
+                                        }
+                                      });
+
+                                      if (maxRatingCount > 0) {
+                                        // Display information about the friend with the most ratings
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            FutureBuilder<DocumentSnapshot>(
+                                              future: users
+                                                  .doc(friendWithMostRatings)
+                                                  .get(),
+                                              builder:
+                                                  (context, friendSnapshot) {
+                                                if (friendSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.done) {
+                                                  if (friendSnapshot.hasError) {
+                                                    return Container(
+                                                      child: Text(
+                                                          'Error: ${friendSnapshot.error}'),
+                                                    );
+                                                  }
+
+                                                  if (friendSnapshot.hasData) {
+                                                    Map<String, dynamic>
+                                                        friendData =
+                                                        friendSnapshot.data!
+                                                                .data()
+                                                            as Map<String,
+                                                                dynamic>;
+
+                                                    String profilePictureUrl =
+                                                        friendData.containsKey(
+                                                                'profilePictureUrl')
+                                                            ? friendData[
+                                                                    'profilePictureUrl'] ??
+                                                                ''
+                                                            : '';
+                                                    int ratingCount =
+                                                        ratingStatistics[
+                                                                friendWithMostRatings] ??
+                                                            0;
+
+                                                    return Row(
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Most Rates to Your Posts: $ratingCount',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 95),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            CircleAvatar(
+                                                              radius: 40,
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                      profilePictureUrl),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 3),
+                                                            Text(
+                                                              friendData[
+                                                                  'username'],
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                }
+
+                                                return Container();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        // Display a message when none of the friends have rated posts
+                                        return Column(
+                                          children: [
+                                            SizedBox(height: 40),
+                                            Text(
+                                              'No one friend rated any of your posts yet.',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    }
+                                  }
+
+                                  return Container(); // Handle loading state or empty state
+                                },
+                              ),
+                            ],
+                          )
+                        : Container(),
+                    friendsList.isNotEmpty
+                        ? FutureBuilder<Map<String, int>>(
+                            future: fetchFriendPostStatistics(
+                              currentUserId,
+                              friendsList,
+                              posts,
+                            ),
+                            builder: (context, postStatsSnapshot) {
+                              if (postStatsSnapshot.connectionState ==
+                                  ConnectionState.done) {
+                                if (postStatsSnapshot.hasError) {
+                                  return Container(
+                                    child: Text(
+                                        'Error: ${postStatsSnapshot.error}'),
+                                  );
+                                }
+
+                                Map<String, int>? postStatistics =
+                                    postStatsSnapshot.data;
+
+                                if (postStatistics != null) {
+                                  return Column(
+                                    children: [
+                                      // Display friend post statistics
+
+                                      SizedBox(height: 3),
+                                      // Iterate over friends and display statistics
+                                    ],
+                                  );
+                                }
+                              }
+
+                              return Container(); // Handle loading state or empty state
+                            },
+                          )
+                        : Container(),
+                    friendsList.isNotEmpty
                         ? Container()
                         : const SizedBox(
                             height: 350,
@@ -287,15 +791,6 @@ class Friends extends StatelessWidget {
                               ),
                             ),
                           ),
-                    friendsList.isNotEmpty
-                        ? Column(
-                            children: [
-                              buildTopFriendsText(context),
-                              // Add other features/widgets here
-                              // ...
-                            ],
-                          )
-                        : Container(),
                   ],
                 ),
               ),
@@ -319,12 +814,78 @@ class Friends extends StatelessWidget {
     );
   }
 
-  Widget buildBackgroundContainer() {
-    return Positioned.fill(
-      child: Container(
-        color: Colors.white,
-      ),
-    );
+  Future<Map<String, int>> fetchFriendPostStatistics(String currentUserId,
+      List<dynamic> friendsList, CollectionReference posts,
+      {String? photoType}) async {
+    Map<String, int> postStatistics = {};
+
+    try {
+      for (String friendId in friendsList) {
+        // Fetch all posts
+        QuerySnapshot allPostsSnapshot = await posts.get();
+
+        // Count the number of posts where the friend's ID matches the post's userID
+        int postCount = 0;
+
+        for (QueryDocumentSnapshot postDoc in allPostsSnapshot.docs) {
+          Map<String, dynamic> postData =
+              postDoc.data() as Map<String, dynamic>;
+
+          // Check if the userID in the post matches the friend's ID and the photoType matches
+          if (postData['userId'] == friendId &&
+              postData['photoType'] == photoType) {
+            postCount++;
+          }
+        }
+
+        // Store the count in the postStatistics map
+        postStatistics[friendId] = postCount;
+      }
+
+      return postStatistics;
+    } catch (e) {
+      print('Error fetching friend post statistics: $e');
+      return postStatistics; // Return an empty map in case of an error
+    }
+  }
+
+  Future<Map<String, int>> fetchFriendRatingStatistics(String currentUserId,
+      List<dynamic> friendsList, CollectionReference posts) async {
+    Map<String, int> ratingStatistics = {};
+
+    try {
+      // Fetch all posts by the current user
+      QuerySnapshot userPostsSnapshot =
+          await posts.where('userId', isEqualTo: currentUserId).get();
+
+      // Iterate through the user's posts
+      for (QueryDocumentSnapshot postDoc in userPostsSnapshot.docs) {
+        String postId = postDoc.id;
+
+        // Check if the post has a 'ratings' subcollection
+        QuerySnapshot ratingsSnapshot =
+            await postDoc.reference.collection('ratings').get();
+
+        if (ratingsSnapshot.docs.isNotEmpty) {
+          // Count the number of ratings by each friend
+          for (QueryDocumentSnapshot ratingDoc in ratingsSnapshot.docs) {
+            String friendId = ratingDoc.id;
+
+            // Check if the friend is in the friendsList
+            if (friendsList.contains(friendId)) {
+              // Increment the rating count for the friend
+              ratingStatistics.update(friendId, (count) => count + 1,
+                  ifAbsent: () => 1);
+            }
+          }
+        }
+      }
+
+      return ratingStatistics;
+    } catch (e) {
+      print('Error fetching friend rating statistics: $e');
+      return ratingStatistics; // Return an empty map in case of an error
+    }
   }
 
   Widget buildTopFriendsText(BuildContext context) {
@@ -354,32 +915,19 @@ class Friends extends StatelessWidget {
     );
   }
 
-  Widget buildTextWithImage(BuildContext context, String text) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      width: MediaQuery.of(context).size.width,
+      height: 65,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            width: 120,
-            height: 120,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage('assets/images/profile_pic.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          _buildNavBarItem(context, Icons.home, "Home"),
+          _buildNavBarItem(context, Icons.people, "Friends"),
+          _buildCenterButton(context),
+          _buildNavBarItem(context, Icons.search, "Search"),
+          _buildNavBarItem(context, Icons.person, "Profile"),
         ],
       ),
     );
@@ -437,24 +985,6 @@ class Friends extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const Post()),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      width: MediaQuery.of(context).size.width,
-      height: 65,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavBarItem(context, Icons.home, "Home"),
-          _buildNavBarItem(context, Icons.people, "Friends"),
-          _buildCenterButton(context),
-          _buildNavBarItem(context, Icons.search, "Search"),
-          _buildNavBarItem(context, Icons.person, "Profile"),
-        ],
       ),
     );
   }
