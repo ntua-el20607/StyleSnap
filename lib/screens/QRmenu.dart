@@ -14,7 +14,7 @@ class QRMenuScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 100), // Space from the top
+            const SizedBox(height: 100), // Space from the top
             _buildButtonBar(context),
             Expanded(
               child: FutureBuilder<DocumentSnapshot>(

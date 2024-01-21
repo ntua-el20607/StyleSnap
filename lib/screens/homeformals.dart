@@ -16,6 +16,14 @@ class HomeFormals extends StatefulWidget {
 }
 
 class _HomeFormalsState extends State<HomeFormals> {
+  Map<String, int> postRatings = {};
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialRatings();
+  }
+
   final List<int> _ratings = List.generate(100, (index) => 0);
 
   @override
@@ -43,7 +51,7 @@ class _HomeFormalsState extends State<HomeFormals> {
                 textAlign: TextAlign.center,
               ),
               Positioned(
-                right: 16.0,
+                left: 16.0,
                 child: _buildArrowIcon(context),
               ),
             ],
@@ -104,7 +112,7 @@ class _HomeFormalsState extends State<HomeFormals> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Spacer(),
-                      _buildStarRating(index),
+                      _buildStarRating(postId),
                       const Spacer(),
                       _buildCommentIcon(context, postId),
                     ],
@@ -200,24 +208,99 @@ class _HomeFormalsState extends State<HomeFormals> {
     );
   }
 
-  Widget _buildStarRating(int index) {
+  Widget _buildStarRating(String postId) {
+    int userRating = postRatings[postId] ?? 0;
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (starIndex) {
+      children: List.generate(5, (index) {
         return IconButton(
           icon: Icon(
-            _ratings[index] > starIndex ? Icons.star : Icons.star_border,
-            color: _ratings[index] > starIndex ? Colors.amber : Colors.grey,
-            size: 30.0,
+            userRating > index ? Icons.star : Icons.star_border,
+            color: userRating > index ? Colors.amber : Colors.grey,
           ),
-          onPressed: () {
+          onPressed: () async {
+            await updateUserRatingForPost(postId, index + 1);
             setState(() {
-              _ratings[index] = starIndex + 1;
+              postRatings[postId] = index + 1;
             });
           },
         );
       }),
     );
+  }
+
+  Future<int> getUserRatingForPost(String postId) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return 0;
+
+    try {
+      var ratingDoc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('ratings')
+          .doc(currentUser.uid)
+          .get();
+
+      if (ratingDoc.exists) {
+        var data = ratingDoc.data();
+        return data?['rating'] ?? 0;
+      } else {
+        return 0;
+      }
+    } catch (e) {
+      print('Error fetching user rating: $e');
+      return 0;
+    }
+  }
+
+  Future<void> updateUserRatingForPost(String postId, int rating) async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    var ratingRef = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('ratings')
+        .doc(currentUser.uid);
+
+    // Check if the rating document exists
+    var doc = await ratingRef.get();
+    if (!doc.exists) {
+      // Create the document with the initial rating
+      await ratingRef.set({
+        'rating': rating,
+      });
+    } else {
+      // Update the existing rating
+      await ratingRef.update({
+        'rating': rating,
+      });
+    }
+  }
+
+  void fetchInitialRatings() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    var snapshot = await FirebaseFirestore.instance.collection('posts').get();
+
+    var initialRatings = <String, int>{};
+    for (var doc in snapshot.docs) {
+      var ratingDoc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(doc.id)
+          .collection('ratings')
+          .doc(currentUser.uid)
+          .get();
+
+      initialRatings[doc.id] = ratingDoc.data()?['rating'] ?? 0;
+    }
+
+    if (mounted) {
+      setState(() {
+        postRatings = initialRatings;
+      });
+    }
   }
 
   Widget _buildCommentIcon(BuildContext context, String postId) {

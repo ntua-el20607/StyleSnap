@@ -17,7 +17,6 @@ class HomeCasuals extends StatefulWidget {
 
 class _HomeCasualsState extends State<HomeCasuals> {
   Map<String, int> postRatings = {};
-  final List<int> _ratings = List.generate(100, (index) => 0);
 
   @override
   void initState() {

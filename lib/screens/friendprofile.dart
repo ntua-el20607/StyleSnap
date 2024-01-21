@@ -137,7 +137,7 @@ class friendprof extends StatelessWidget {
           decoration: const ShapeDecoration(
             shape: CircleBorder(),
             image: DecorationImage(
-              image: AssetImage('assets/images/ruklas.png'),
+              image: AssetImage('assets/images/profile_pic.png'),
               fit: BoxFit.cover,
             ),
           ),

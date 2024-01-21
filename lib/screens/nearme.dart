@@ -52,6 +52,9 @@ class _NearmeState extends State<Nearme> {
     }
 
     var locationData = await location.getLocation();
+
+    if (!mounted) return;
+
     setState(() {
       _initialCameraPosition =
           LatLng(locationData.latitude!, locationData.longitude!);
@@ -335,6 +338,8 @@ class _NearmeState extends State<Nearme> {
       var location = data['location'] as GeoPoint;
       var userId = data['userId'];
 
+      if (!mounted) return;
+
       setState(() {
         _markers.add(Marker(
           markerId: MarkerId(doc.id),
@@ -429,17 +434,25 @@ class _NearmeState extends State<Nearme> {
   }
 
   Widget _buildUserProfile(Map<String, dynamic> userData) {
+    // Safely cast the profile picture URL as a string, or null if it's not available
+    String? profilePicUrl = userData['profilePictureUrl'] as String?;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         CircleAvatar(
           radius: 60, // Adjust the size as needed
-          backgroundImage: NetworkImage(
-              userData['profilePictureUrl']), // Assuming this is the field name
+          backgroundImage: profilePicUrl != null && profilePicUrl.isNotEmpty
+              ? NetworkImage(profilePicUrl) as ImageProvider
+              : const AssetImage(
+                  'assets/images/profile_pic.png'), // Default profile picture
+          backgroundColor:
+              Colors.grey, // Fallback color if the image fails to load
         ),
         const SizedBox(height: 8),
         Text(
-          userData['username'],
+          userData['username'] ??
+              'Username', // Fallback text in case username is null
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -473,34 +486,43 @@ class _NearmeState extends State<Nearme> {
               ),
             ),
             onPressed: () async {
-              bool isFriend = await _checkIfUserIsFriend(userId);
-
-              if (isFriend) {
+              if (userId == getCurrentUserId()) {
+                // If the user is viewing their own profile, navigate to ProfileScreen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => friendprof(
-                      userId: userId,
-                      fullName: userData['fullName'],
-                      email: userData['email'],
-                      phoneNumber: userData['phoneNumber'],
-                      username: userData['username'],
-                    ),
-                  ),
+                      builder: (context) => const ProfileScreen()),
                 );
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => addfriend(
-                      userId: userId,
-                      fullName: userData['fullName'],
-                      email: userData['email'],
-                      phoneNumber: userData['phoneNumber'],
-                      username: userData['username'],
+                // If viewing someone else's profile, check if they are a friend
+                bool isFriend = await _checkIfUserIsFriend(userId);
+                if (isFriend) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => friendprof(
+                        userId: userId,
+                        fullName: userData['fullName'],
+                        email: userData['email'],
+                        phoneNumber: userData['phoneNumber'],
+                        username: userData['username'],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => addfriend(
+                        userId: userId,
+                        fullName: userData['fullName'],
+                        email: userData['email'],
+                        phoneNumber: userData['phoneNumber'],
+                        username: userData['username'],
+                      ),
+                    ),
+                  );
+                }
               }
             },
             child: const Text('View Profile'),
@@ -518,5 +540,14 @@ class _NearmeState extends State<Nearme> {
         .get();
     List<dynamic> friends = currentUserDoc.data()?['friends'] ?? [];
     return friends.contains(userId);
+  }
+
+  @override
+  void dispose() {
+    // Dispose your controllers, listeners, etc. here
+    mapController.dispose();
+    // Dispose other resources if needed
+
+    super.dispose(); // Always call super.dispose() at the end
   }
 }
