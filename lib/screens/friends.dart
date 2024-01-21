@@ -3,7 +3,6 @@ import 'package:stylesnap/screens/Post.dart';
 import 'package:stylesnap/screens/homecasuals.dart';
 import 'package:stylesnap/screens/nearme.dart';
 import 'package:stylesnap/screens/profile.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:stylesnap/screens/FriendProfile.dart'; // Import the FriendProfile screen
@@ -110,7 +109,7 @@ class ScrollableImageRow extends StatelessWidget {
                                     const SizedBox(height: 8),
                                     Text(
                                       friendUsername,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -127,7 +126,7 @@ class ScrollableImageRow extends StatelessWidget {
                                   Container(
                                     width: 120,
                                     height: 120,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
                                         image: AssetImage(
@@ -139,7 +138,7 @@ class ScrollableImageRow extends StatelessWidget {
                                   const SizedBox(height: 8),
                                   Text(
                                     friendUsername,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -162,7 +161,7 @@ class ScrollableImageRow extends StatelessWidget {
             return Container(); // Handle when user document does not exist
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -230,8 +229,8 @@ class Friends extends StatelessWidget {
                   children: [
                     const SizedBox(height: 60),
                     friendsList.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 20),
+                        ? const Padding(
+                            padding: EdgeInsets.only(top: 20),
                             child: Center(
                               child: Text(
                                 'FRIENDS',
@@ -245,7 +244,7 @@ class Friends extends StatelessWidget {
                           )
                         : Container(),
                     friendsList.isNotEmpty
-                        ? SizedBox(
+                        ? const SizedBox(
                             height: 200,
                             child: ScrollableImageRow(),
                           )
@@ -760,7 +759,7 @@ class Friends extends StatelessWidget {
                           ),
                     friendsList.isNotEmpty
                         ? Container()
-                        : Center(
+                        : const Center(
                             child: Text(
                               'No friends yet',
                               style: TextStyle(
@@ -782,9 +781,9 @@ class Friends extends StatelessWidget {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.purple,
+                              backgroundColor: Colors.purple,
                             ),
-                            child: Text(
+                            child: const Text(
                               'Search for friends',
                               style: TextStyle(
                                 color: Colors.white,
@@ -804,7 +803,7 @@ class Friends extends StatelessWidget {
             );
           }
         } else {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),

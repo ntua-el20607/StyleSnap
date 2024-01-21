@@ -126,14 +126,19 @@ class addfriend extends StatelessWidget {
       future: _getProfilePictureUrl(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // While waiting for the data, show a loading indicator or placeholder
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          // If an error occurs, handle it accordingly
           return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          // If data is available, display the profile picture
-          String profilePictureUrl = snapshot.data.toString();
+        } else {
+          String profilePictureUrl = snapshot.data?.toString() ?? '';
+
+          ImageProvider imageProvider;
+          if (profilePictureUrl.isNotEmpty) {
+            imageProvider = NetworkImage(profilePictureUrl);
+          } else {
+            imageProvider = const AssetImage('assets/images/profile_pic.png');
+          }
+
           return Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -143,16 +148,14 @@ class addfriend extends StatelessWidget {
                 width: 142,
                 height: 142.29,
                 decoration: ShapeDecoration(
-                  shape:
-                      const CircleBorder(), // Circle shape for the profile picture
+                  shape: const CircleBorder(),
                   image: DecorationImage(
-                    image: NetworkImage(profilePictureUrl),
-                    fit: BoxFit.cover, // Ensures the image covers the container
+                    image: imageProvider,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const SizedBox(
-                  height: 10), // Space between the image and the text
+              const SizedBox(height: 10),
               Text(
                 username,
                 style: const TextStyle(
@@ -161,9 +164,6 @@ class addfriend extends StatelessWidget {
               ),
             ],
           );
-        } else {
-          // Handle the case where no data is available
-          return const Text('No data available');
         }
       },
     );

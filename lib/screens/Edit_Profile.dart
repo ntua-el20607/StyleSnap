@@ -126,25 +126,97 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void onDeleteAccountPressed() async {
     try {
-      // Get the current user
       final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('No user logged in.');
+        return;
+      }
 
-      // Get the user ID
-      final userId = user!.uid;
+      final userId = user.uid;
 
-      // Delete the user document from Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+      // Deleting comments, ratings, and user data
+      await deleteUserComments(userId);
+      await deleteUserRatings(userId);
+      await deleteUserPosts(userId);
+      await removeUserFromFriendsLists(userId);
+      await deleteUserDocument(userId);
 
       // Delete the user account
       await user.delete();
 
       // Navigate to the StartPage
-      Navigator.of(context).pushAndRemoveUntil(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const start()),
-        (Route<dynamic> route) => false,
       );
     } catch (e) {
       print('Error deleting account: $e');
+    }
+  }
+
+  Future<void> deleteUserPosts(String userId) async {
+    var userPosts = await FirebaseFirestore.instance
+        .collection('posts')
+        .where('userId', isEqualTo: userId)
+        .get();
+    for (var post in userPosts.docs) {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(post.id)
+          .delete();
+    }
+  }
+
+  Future<void> removeUserFromFriendsLists(String userId) async {
+    var allUsers = await FirebaseFirestore.instance.collection('users').get();
+    for (var userDoc in allUsers.docs) {
+      var friends = List.from(userDoc.data()['friends'] ?? []);
+      if (friends.contains(userId)) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userDoc.id)
+            .update({
+          'friends': FieldValue.arrayRemove([userId])
+        });
+      }
+    }
+  }
+
+  Future<void> deleteUserDocument(String userId) async {
+    await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+  }
+
+  Future<void> deleteUserComments(String userId) async {
+    var firestore = FirebaseFirestore.instance;
+    var postsSnapshot = await firestore.collection('posts').get();
+    for (var postDoc in postsSnapshot.docs) {
+      var commentsSnapshot = await firestore
+          .collection('posts')
+          .doc(postDoc.id)
+          .collection('comments')
+          .where('userId', isEqualTo: userId)
+          .get();
+      for (var commentDoc in commentsSnapshot.docs) {
+        await firestore
+            .collection('posts')
+            .doc(postDoc.id)
+            .collection('comments')
+            .doc(commentDoc.id)
+            .delete();
+      }
+    }
+  }
+
+  Future<void> deleteUserRatings(String userId) async {
+    var firestore = FirebaseFirestore.instance;
+    var postsSnapshot = await firestore.collection('posts').get();
+
+    for (var postDoc in postsSnapshot.docs) {
+      await firestore
+          .collection('posts')
+          .doc(postDoc.id)
+          .collection('ratings')
+          .doc(userId)
+          .delete();
     }
   }
 

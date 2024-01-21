@@ -18,6 +18,7 @@ class Nearme extends StatefulWidget {
 }
 
 class _NearmeState extends State<Nearme> {
+  Set<Marker> _markers = {};
   late GoogleMapController mapController;
   LatLng _initialCameraPosition =
       const LatLng(20.5937, 78.9629); // Default location
@@ -27,6 +28,7 @@ class _NearmeState extends State<Nearme> {
   void initState() {
     super.initState();
     _getUserLocation();
+    _fetchPostsAndCreateMarkers();
   }
 
   void _getUserLocation() async {
@@ -50,6 +52,9 @@ class _NearmeState extends State<Nearme> {
     }
 
     var locationData = await location.getLocation();
+
+    if (!mounted) return;
+
     setState(() {
       _initialCameraPosition =
           LatLng(locationData.latitude!, locationData.longitude!);
@@ -88,6 +93,7 @@ class _NearmeState extends State<Nearme> {
               ),
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
+              markers: _markers,
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -322,5 +328,226 @@ class _NearmeState extends State<Nearme> {
         .limit(1)
         .get();
     return userQuery.docs.isNotEmpty;
+  }
+
+  void _fetchPostsAndCreateMarkers() async {
+    var postsSnapshot =
+        await FirebaseFirestore.instance.collection('posts').get();
+    for (var doc in postsSnapshot.docs) {
+      var data = doc.data();
+      var location = data['location'] as GeoPoint;
+      var userId = data['userId'];
+
+      if (!mounted) return;
+
+      setState(() {
+        _markers.add(Marker(
+          markerId: MarkerId(doc.id),
+          position: LatLng(location.latitude, location.longitude),
+          onTap: () => _showUserDetails(userId),
+        ));
+      });
+    }
+  }
+
+  void _showUserDetails(String userId) async {
+    var userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      var userData = userDoc.data();
+      if (userData != null) {
+        // Add the userId to the userData map
+        userData['userId'] = userId;
+        print("Fetched userData with userId: $userData");
+        _showBottomSheet(context, userData);
+      } else {
+        print("User data is null");
+      }
+    } else {
+      print("User document does not exist");
+    }
+  }
+
+  void _showBottomSheet(BuildContext context, Map<String, dynamic>? userData) {
+    if (userData == null) {
+      // Handle the case where userData is null
+      // For example, you can show an error message or close the bottom sheet
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User data not available.')),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext bc) {
+        return DraggableScrollableSheet(
+          expand: false,
+          builder: (_, controller) {
+            return Column(
+              children: [
+                _buildBottomSheetHeader(context),
+                Expanded(
+                  child: ListView(
+                    controller: controller,
+                    children: [
+                      _buildUserProfile(userData),
+                      _buildViewProfileButton(context, userData),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetHeader(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 8, // Adjust height as needed
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.5, // Make the line thinner
+          ),
+        ),
+      ),
+      child: Align(
+        alignment: Alignment.center,
+        child: Container(
+          width: 60,
+          height: 7,
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserProfile(Map<String, dynamic> userData) {
+    // Safely cast the profile picture URL as a string, or null if it's not available
+    String? profilePicUrl = userData['profilePictureUrl'] as String?;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          radius: 60, // Adjust the size as needed
+          backgroundImage: profilePicUrl != null && profilePicUrl.isNotEmpty
+              ? NetworkImage(profilePicUrl) as ImageProvider
+              : const AssetImage(
+                  'assets/images/profile_pic.png'), // Default profile picture
+          backgroundColor:
+              Colors.grey, // Fallback color if the image fails to load
+        ),
+        const SizedBox(height: 8),
+        Text(
+          userData['username'] ??
+              'Username', // Fallback text in case username is null
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildViewProfileButton(
+      BuildContext context, Map<String, dynamic> userData) {
+    String? userId = userData['userId'];
+
+    if (userId == null) {
+      return SizedBox.shrink(); // Return an empty widget if userId is null
+    }
+
+    double buttonWidth = MediaQuery.of(context).size.width * 0.6;
+    return Padding(
+      padding: const EdgeInsets.only(top: 50),
+      child: Center(
+        child: SizedBox(
+          width: buttonWidth, // Set the button width
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: const Color(0xFF9747FF), // Background color
+              onPrimary: Colors.white, // Text color
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(50), // Optional: Rounded corners
+              ),
+            ),
+            onPressed: () async {
+              if (userId == getCurrentUserId()) {
+                // If the user is viewing their own profile, navigate to ProfileScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
+                );
+              } else {
+                // If viewing someone else's profile, check if they are a friend
+                bool isFriend = await _checkIfUserIsFriend(userId);
+                if (isFriend) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => friendprof(
+                        userId: userId,
+                        fullName: userData['fullName'],
+                        email: userData['email'],
+                        phoneNumber: userData['phoneNumber'],
+                        username: userData['username'],
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => addfriend(
+                        userId: userId,
+                        fullName: userData['fullName'],
+                        email: userData['email'],
+                        phoneNumber: userData['phoneNumber'],
+                        username: userData['username'],
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('View Profile'),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _checkIfUserIsFriend(String userId) async {
+    String currentUserId = getCurrentUserId();
+    var currentUserDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .get();
+    List<dynamic> friends = currentUserDoc.data()?['friends'] ?? [];
+    return friends.contains(userId);
+  }
+
+  @override
+  void dispose() {
+    // Dispose your controllers, listeners, etc. here
+    mapController.dispose();
+    // Dispose other resources if needed
+
+    super.dispose(); // Always call super.dispose() at the end
   }
 }

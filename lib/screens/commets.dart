@@ -157,84 +157,111 @@ class _CommentsState extends State<Comments> {
 
   Widget _buildCommentSection(
       String name, String comment, String profilePictureUrl, String userId) {
-    // Check if the profile picture belongs to the logged-in user
-    bool isCurrentUser = userId == FirebaseAuth.instance.currentUser?.uid;
+    // Determine if the comment belongs to the current user
+    bool isCurrentUser = FirebaseAuth.instance.currentUser?.uid == userId;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () async {
-              if (isCurrentUser) {
-                // Navigate to the logged-in user's profile screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                );
-              } else {
-                print("Fetching details for userId: $userId");
-                var userDetails = await getUserDetails(userId);
-                print("User details fetched: $userDetails");
+    return FutureBuilder<DocumentSnapshot>(
+        future:
+            FirebaseFirestore.instance.collection('users').doc(userId).get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // Show loading indicator while fetching
+          }
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              !snapshot.data!.exists) {
+            return Text('Error fetching user details'); // Error handling
+          }
+          Map<String, dynamic> userData =
+              snapshot.data!.data() as Map<String, dynamic>;
+          String profilePictureUrl =
+              userData['profilePictureUrl'] ?? 'default_profile_picture_url';
 
-                if (userDetails.isNotEmpty) {
-                  bool friendStatus = await isFriend(userId);
-                  if (friendStatus) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => friendprof(
-                          userId: userId,
-                          fullName: userDetails['fullName'],
-                          email: userDetails['email'],
-                          phoneNumber: userDetails['phoneNumber'],
-                          username: userDetails['username'],
-                        ),
-                      ),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => addfriend(
-                          userId: userId,
-                          fullName: userDetails['fullName'],
-                          email: userDetails['email'],
-                          phoneNumber: userDetails['phoneNumber'],
-                          username: userDetails['username'],
-                        ),
-                      ),
-                    );
-                  }
-                } else {
-                  print("No user details found for userId: $userId");
-                }
-              }
-            },
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(profilePictureUrl),
-              radius: 35,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
+          ImageProvider imageProvider;
+          if (profilePictureUrl != "default_profile_picture_url") {
+            imageProvider = NetworkImage(profilePictureUrl);
+          } else {
+            imageProvider = const AssetImage('assets/images/profile_pic.png');
+          }
+
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                GestureDetector(
+                  onTap: () async {
+                    if (isCurrentUser) {
+                      // Navigate to the logged-in user's profile screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
+                    } else {
+                      print("Fetching details for userId: $userId");
+                      var userDetails = await getUserDetails(userId);
+                      print("User details fetched: $userDetails");
+
+                      if (userDetails.isNotEmpty) {
+                        bool friendStatus = await isFriend(userId);
+                        if (friendStatus) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => friendprof(
+                                userId: userId,
+                                fullName: userDetails['fullName'],
+                                email: userDetails['email'],
+                                phoneNumber: userDetails['phoneNumber'],
+                                username: userDetails['username'],
+                              ),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => addfriend(
+                                userId: userId,
+                                fullName: userDetails['fullName'],
+                                email: userDetails['email'],
+                                phoneNumber: userDetails['phoneNumber'],
+                                username: userDetails['username'],
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        print("No user details found for userId: $userId");
+                      }
+                    }
+                  },
+                  child: CircleAvatar(
+                    backgroundImage: imageProvider,
+                    radius: 35,
+                  ),
                 ),
-                Text(comment),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(comment),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Future<Map<String, dynamic>> getUserDetails(String userId) async {
@@ -309,13 +336,18 @@ class _CommentsState extends State<Comments> {
   }
 
   Widget _buildCommentInputField() {
+    var imageProvider = (currentUserProfilePictureUrl.isNotEmpty &&
+            currentUserProfilePictureUrl != 'default_profile_picture_url')
+        ? NetworkImage(currentUserProfilePictureUrl) as ImageProvider
+        : const AssetImage('assets/images/profile_pic.png');
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(
-                currentUserProfilePictureUrl), // Update with user's profile picture
+            backgroundImage:
+                imageProvider, // Update with user's profile picture
             radius: 35,
           ),
           const SizedBox(width: 16),
